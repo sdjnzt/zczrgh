@@ -415,6 +415,39 @@ const UrbanPlanning: React.FC = () => {
     ]
   };
 
+  // 规划类型饼图配置
+  const typeChartOption = {
+    title: {
+      text: '规划类型分布',
+      left: 'center'
+    },
+    tooltip: {
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c} ({d}%)'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      data: typeData.map(item => item.name)
+    },
+    series: [
+      {
+        name: '规划类型',
+        type: 'pie',
+        radius: '60%',
+        center: ['50%', '50%'],
+        data: typeData,
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
+  };
+
   // 上传组件配置
   const uploadProps = {
     name: 'file',
@@ -536,7 +569,7 @@ const UrbanPlanning: React.FC = () => {
             </Col>
             <Col span={12}>
               <Card>
-                <ReactECharts option={yearlyTrendOption} style={{ height: 400 }} />
+                <ReactECharts option={typeChartOption} style={{ height: 400 }} />
               </Card>
             </Col>
           </Row>
