@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Steps, DatePicker, Form, Tooltip } from 'antd';
-import { SearchOutlined, FileAddOutlined, CheckCircleOutlined, ClockCircleOutlined, FileTextOutlined, UserOutlined, EyeOutlined, EditOutlined, ApartmentOutlined } from '@ant-design/icons';
+import { SearchOutlined, FileAddOutlined, CheckCircleOutlined, ClockCircleOutlined, FileTextOutlined, EyeOutlined, EditOutlined, ApartmentOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
 
@@ -228,16 +228,6 @@ const ProjectApproval: React.FC = () => {
     { value: projects.filter(item => item.status === '审批中').length, name: '审批中' },
     { value: projects.filter(item => item.status === '已通过').length, name: '已通过' },
     { value: projects.filter(item => item.status === '已驳回').length, name: '已驳回' },
-  ];
-
-  // 项目类型统计
-  const typeData = [
-    { value: projects.filter(item => item.type === '土地开发').length, name: '土地开发' },
-    { value: projects.filter(item => item.type === '产业园区').length, name: '产业园区' },
-    { value: projects.filter(item => item.type === '生态规划').length, name: '生态规划' },
-    { value: projects.filter(item => item.type === '农业发展').length, name: '农业发展' },
-    { value: projects.filter(item => item.type === '城市更新').length, name: '城市更新' },
-    { value: projects.filter(item => item.type === '景观工程').length, name: '景观工程' },
   ];
 
   // 项目状态饼图配置

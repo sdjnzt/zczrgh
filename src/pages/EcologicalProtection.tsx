@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Alert, Progress, DatePicker, Divider } from 'antd';
-import { AreaChartOutlined, EnvironmentOutlined, WarningOutlined, ExclamationCircleOutlined, SearchOutlined, LineChartOutlined, DownloadOutlined, PlusOutlined } from '@ant-design/icons';
+import { AreaChartOutlined, EnvironmentOutlined, WarningOutlined, ExclamationCircleOutlined, SearchOutlined, LineChartOutlined, PlusOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
 

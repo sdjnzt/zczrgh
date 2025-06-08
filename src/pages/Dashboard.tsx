@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, Row, Col, Statistic, Progress, Table, Tabs } from 'antd';
-import { EnvironmentOutlined, BuildOutlined, HomeOutlined, FileProtectOutlined, AlertOutlined, AreaChartOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Statistic, Table, Tabs } from 'antd';
+import { EnvironmentOutlined, BuildOutlined, HomeOutlined, AreaChartOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 
 const Dashboard: React.FC = () => {
@@ -12,15 +12,6 @@ const Dashboard: React.FC = () => {
     forest: 162, // 林地
     water: 45, // 水域
     other: 30, // 其他用地
-  };
-
-  // 规划许可数据
-  const planningPermitData = {
-    total: 520, // 总许可数
-    residential: 180, // 住宅
-    commercial: 125, // 商业
-    industrial: 150, // 工业
-    publicService: 65, // 公共服务
   };
 
   // 不动产登记数据
