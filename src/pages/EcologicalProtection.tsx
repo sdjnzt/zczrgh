@@ -277,7 +277,7 @@ const EcologicalProtection: React.FC = () => {
       title: '保护区名称',
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <Button type="link" style={{padding: 0}}>{text}</Button>,
     },
     {
       title: '保护类型',
@@ -354,9 +354,9 @@ const EcologicalProtection: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <a>查看详情</a>
-          <a>监测数据</a>
-          <a>管理</a>
+          <Button type="link" style={{padding: 0}}>查看详情</Button>
+          <Button type="link" style={{padding: 0}}>监测数据</Button>
+          <Button type="link" style={{padding: 0}}>管理</Button>
         </Space>
       ),
     },
@@ -374,7 +374,7 @@ const EcologicalProtection: React.FC = () => {
       title: '监测点名称',
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <Button type="link" style={{padding: 0}}>{text}</Button>,
     },
     {
       title: '所属保护区',
@@ -438,8 +438,8 @@ const EcologicalProtection: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <a>查看趋势</a>
-          <a>查看详情</a>
+          <Button type="link" style={{padding: 0}}>查看趋势</Button>
+          <Button type="link" style={{padding: 0}}>查看详情</Button>
         </Space>
       ),
     },
@@ -457,7 +457,7 @@ const EcologicalProtection: React.FC = () => {
       title: '事件标题',
       dataIndex: 'title',
       key: 'title',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <Button type="link" style={{padding: 0}}>{text}</Button>,
     },
     {
       title: '事件类型',
@@ -539,8 +539,8 @@ const EcologicalProtection: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <a>查看详情</a>
-          <a>处理</a>
+          <Button type="link" style={{padding: 0}}>查看详情</Button>
+          <Button type="link" style={{padding: 0}}>处理</Button>
         </Space>
       ),
     },

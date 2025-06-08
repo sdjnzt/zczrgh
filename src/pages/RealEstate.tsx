@@ -193,7 +193,7 @@ const RealEstate: React.FC = () => {
       title: '不动产名称',
       dataIndex: 'propertyName',
       key: 'propertyName',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <Button type="link" style={{padding: 0}}>{text}</Button>,
     },
     {
       title: '不动产类型',
@@ -262,9 +262,9 @@ const RealEstate: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <a>查看</a>
-          <a>办理</a>
-          {record.status === '已登记' && <a>打印证书</a>}
+          <Button type="link" style={{padding: 0}}>查看</Button>
+          <Button type="link" style={{padding: 0}}>办理</Button>
+          {record.status === '已登记' && <Button type="link" style={{padding: 0}}>打印证书</Button>}
         </Space>
       ),
     },
@@ -282,7 +282,7 @@ const RealEstate: React.FC = () => {
       title: '不动产名称',
       dataIndex: 'propertyName',
       key: 'propertyName',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <Button type="link" style={{padding: 0}}>{text}</Button>,
     },
     {
       title: '不动产类型',
@@ -346,9 +346,9 @@ const RealEstate: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <a>查看</a>
-          <a>打印</a>
-          {record.status === '有效' && <a>注销</a>}
+          <Button type="link" style={{padding: 0}}>查看</Button>
+          <Button type="link" style={{padding: 0}}>打印</Button>
+          {record.status === '有效' && <Button type="link" style={{padding: 0}}>注销</Button>}
         </Space>
       ),
     },

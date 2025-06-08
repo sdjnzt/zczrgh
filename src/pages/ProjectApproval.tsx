@@ -123,7 +123,7 @@ const ProjectApproval: React.FC = () => {
       },
       render: text => (
         <Tooltip placement="topLeft" title={text}>
-          <a>{text}</a>
+          <Button type="link" style={{padding: 0}}>{text}</Button>
         </Tooltip>
       ),
     },
@@ -153,7 +153,7 @@ const ProjectApproval: React.FC = () => {
       },
       render: text => (
         <Tooltip placement="topLeft" title={text}>
-          {text}
+          <Button type="link" style={{padding: 0}}>{text}</Button>
         </Tooltip>
       ),
     },
@@ -515,8 +515,8 @@ const ProjectApproval: React.FC = () => {
                         key: 'action',
                         render: () => (
                           <Space>
-                            <a>编辑</a>
-                            <a>删除</a>
+                            <Button type="link" style={{padding: 0}}>编辑</Button>
+                            <Button type="link" style={{padding: 0}}>删除</Button>
                           </Space>
                         )
                       },

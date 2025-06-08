@@ -113,7 +113,7 @@ const LandManagement: React.FC = () => {
       title: '地块名称',
       dataIndex: 'name',
       key: 'name',
-      render: (text: string) => <a>{text}</a>,
+      render: (text: string) => <Button type="link" style={{padding: 0}}>{text}</Button>,
     },
     {
       title: '面积(㎡)',
@@ -176,8 +176,8 @@ const LandManagement: React.FC = () => {
       key: 'action',
       render: (_, record: LandParcel) => (
         <Space size="middle">
-          <a>查看</a>
-          <a>编辑</a>
+          <Button type="link" style={{padding: 0}}>查看</Button>
+          <Button type="link" style={{padding: 0}}>编辑</Button>
         </Space>
       ),
     },
