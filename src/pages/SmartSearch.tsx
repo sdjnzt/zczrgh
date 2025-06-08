@@ -232,23 +232,23 @@ const SmartSearch: React.FC = () => {
             </Select>
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />} loading={loading}>
-              搜索
-            </Button>
+                <Button type="primary" htmlType="submit" icon={<SearchOutlined />} loading={loading}>
+                  搜索
+                </Button>
             <Button style={{ margin: '0 8px' }} onClick={onReset} icon={<ReloadOutlined />}>
-              重置
-            </Button>
-          </Form.Item>
+                  重置
+                </Button>
+            </Form.Item>
         </Form>
       </Card>
 
-      <Table
-        columns={columns}
-        dataSource={data}
+        <Table 
+          columns={columns} 
+          dataSource={data} 
         rowKey="key"
         bordered
         scroll={{ x: 1500 }}
-        loading={loading}
+          loading={loading}
       />
 
       {/* 查看详情模态框 */}
@@ -329,7 +329,7 @@ const SmartSearch: React.FC = () => {
                 <Option value="已驳回">已驳回</Option>
               </Select>
             </Form.Item>
-          </Form>
+        </Form>
         )}
       </Modal>
     </div>

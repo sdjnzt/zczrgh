@@ -3,7 +3,6 @@ import { Card, Row, Col, Statistic, Table, Tabs, DatePicker, Button, Select, Ale
 import { AreaChartOutlined, EnvironmentOutlined, WarningOutlined, ExclamationCircleOutlined, EyeOutlined, LineChartOutlined, DownloadOutlined, CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
-import type { RangePickerProps } from 'antd/es/date-picker';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -40,7 +39,6 @@ interface WarningRecord {
 }
 
 const ResourceMonitoring: React.FC = () => {
-  const [dateRange, setDateRange] = useState<any>(null);
   const [resourceType, setResourceType] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<string>('1');
 
@@ -253,13 +251,10 @@ const ResourceMonitoring: React.FC = () => {
       dataIndex: 'trend',
       key: 'trend',
       render: (trend) => {
-        let color = 'green';
         let icon = null;
         if (trend === '下降') {
-          color = 'red';
           icon = <span style={{ color: 'red' }}>↓</span>;
         } else if (trend === '上升') {
-          color = 'green';
           icon = <span style={{ color: 'green' }}>↑</span>;
         }
         return (
@@ -666,7 +661,6 @@ const ResourceMonitoring: React.FC = () => {
               <Col span={8}>
                 <RangePicker 
                   style={{ width: '100%' }} 
-                  onChange={value => setDateRange(value)}
                 />
               </Col>
               <Col span={4}>
