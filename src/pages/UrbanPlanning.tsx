@@ -573,6 +573,14 @@ const UrbanPlanning: React.FC = () => {
               </Card>
             </Col>
           </Row>
+
+          <Row style={{ marginTop: 16 }}>
+            <Col span={24}>
+              <Card>
+                <ReactECharts option={yearlyTrendOption} style={{ height: 400 }} />
+              </Card>
+            </Col>
+          </Row>
         </TabPane>
         
         <TabPane tab="规划图层管理" key="3">
