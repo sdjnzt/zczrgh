@@ -167,7 +167,7 @@ const UrbanPlanning: React.FC = () => {
       title: '项目名称',
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <Button type="link" style={{ padding: 0 }}>{text}</Button>,
     },
     {
       title: '规划类型',
@@ -234,9 +234,9 @@ const UrbanPlanning: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <a>查看</a>
-          <a>编辑</a>
-          <a>文件</a>
+          <Button type="link" style={{ padding: 0 }}>查看</Button>
+          <Button type="link" style={{ padding: 0 }}>编辑</Button>
+          <Button type="link" style={{ padding: 0 }}>文件</Button>
         </Space>
       ),
     },
@@ -254,7 +254,7 @@ const UrbanPlanning: React.FC = () => {
       title: '图层名称',
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <Button type="link" style={{ padding: 0 }}>{text}</Button>,
     },
     {
       title: '图层类型',
@@ -303,9 +303,9 @@ const UrbanPlanning: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <a>预览</a>
-          <a>下载</a>
-          {record.status === '审核中' && <a>审核</a>}
+          <Button type="link" style={{ padding: 0 }}>预览</Button>
+          <Button type="link" style={{ padding: 0 }}>下载</Button>
+          {record.status === '审核中' && <Button type="link" style={{ padding: 0 }}>审核</Button>}
         </Space>
       ),
     },
