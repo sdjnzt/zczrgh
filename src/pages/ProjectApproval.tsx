@@ -7,7 +7,6 @@ import { ColumnsType } from 'antd/es/table';
 const { TabPane } = Tabs;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
-const { Step } = Steps;
 
 // 定义项目类型
 interface Project {
