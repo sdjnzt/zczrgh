@@ -220,7 +220,7 @@ const ResourceMonitoring: React.FC = () => {
       title: '监测点名称',
       dataIndex: 'name',
       key: 'name',
-      render: (text) => <a>{text}</a>,
+      render: (text) => <Button type="link" style={{ padding: 0 }}>{text}</Button>,
     },
     {
       title: '资源类型',
