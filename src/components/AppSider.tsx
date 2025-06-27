@@ -97,6 +97,12 @@ const AppSider: React.FC = () => {
         boxShadow: '2px 0 8px #f0f1f2',
         minHeight: '100vh',
         paddingTop: 24,
+        position: 'fixed',
+        left: 0,
+        top: 64,
+        bottom: 0,
+        zIndex: 100,
+        overflow: 'auto',
       }}
     >
       <Menu

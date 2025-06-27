@@ -27,9 +27,9 @@ const App: React.FC = () => {
         <Route path="*" element={
           <Layout>
             <AppHeader />
-            <Layout>
+            <Layout style={{ marginTop: 64 }}>
               <AppSider />
-              <Layout style={{ padding: '24px' }}>
+              <Layout style={{ padding: '24px', marginLeft: 220 }}>
                 <Content style={{ background: '#fff', padding: 24, margin: 0, minHeight: 280 }}>
                   <Routes>
                     <Route path="/" element={<Dashboard />} />

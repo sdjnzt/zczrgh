@@ -29,7 +29,12 @@ const AppHeader: React.FC = () => {
       padding: '0 24px',
       display: 'flex',
       justifyContent: 'space-between',
-      alignItems: 'center'
+      alignItems: 'center',
+      position: 'fixed',
+      width: '100%',
+      top: 0,
+      zIndex: 1000,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
     }}>
       <div style={{
         display: 'flex',
