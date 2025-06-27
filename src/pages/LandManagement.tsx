@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic } from 'antd';
+import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Modal, Descriptions, Form } from 'antd';
 import { SearchOutlined, EnvironmentOutlined, FileExcelOutlined, FilePdfOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
@@ -28,6 +28,10 @@ interface LandTypeData {
 const LandManagement: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [landType, setLandType] = useState('all');
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [currentLand, setCurrentLand] = useState<LandParcel | null>(null);
+  const [form] = Form.useForm();
 
   // 模拟地块数据
   const landData: LandParcel[] = [
@@ -176,8 +180,8 @@ const LandManagement: React.FC = () => {
       key: 'action',
       render: (_, record: LandParcel) => (
         <Space size="middle">
-          <Button type="link" style={{padding: 0}}>查看</Button>
-          <Button type="link" style={{padding: 0}}>编辑</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleView(record)}>查看</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleEdit(record)}>编辑</Button>
         </Space>
       ),
     },
@@ -267,6 +271,33 @@ const LandManagement: React.FC = () => {
         yAxisIndex: 1,
       }
     ]
+  };
+
+  const handleView = (record: LandParcel) => {
+    setCurrentLand(record);
+    setViewModalVisible(true);
+  };
+
+  const handleEdit = (record: LandParcel) => {
+    setCurrentLand(record);
+    form.setFieldsValue(record);
+    setEditModalVisible(true);
+  };
+
+  const handleEditSubmit = () => {
+    form.validateFields().then(values => {
+      // 在实际应用中，这里会调用API保存数据
+      console.log('提交的表单数据:', values);
+      // 更新本地数据（模拟）
+      if (currentLand) {
+        const index = landData.findIndex(item => item.key === currentLand.key);
+        if (index !== -1) {
+          // 实际项目中这里应该通过API更新后端数据
+          // landData[index] = { ...landData[index], ...values };
+        }
+      }
+      setEditModalVisible(false);
+    });
   };
 
   return (
@@ -375,6 +406,74 @@ const LandManagement: React.FC = () => {
           </Row>
         </TabPane>
       </Tabs>
+
+      {/* 查看详情模态框 */}
+      <Modal
+        title="地块详情"
+        open={viewModalVisible}
+        onCancel={() => setViewModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setViewModalVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentLand && (
+          <Descriptions bordered column={2}>
+            <Descriptions.Item label="地块编号">{currentLand.id}</Descriptions.Item>
+            <Descriptions.Item label="地块名称">{currentLand.name}</Descriptions.Item>
+            <Descriptions.Item label="面积(㎡)">{currentLand.area}</Descriptions.Item>
+            <Descriptions.Item label="用地类型">{currentLand.type}</Descriptions.Item>
+            <Descriptions.Item label="位置">{currentLand.location}</Descriptions.Item>
+            <Descriptions.Item label="出让状态">{currentLand.status}</Descriptions.Item>
+            <Descriptions.Item label="使用权人" span={2}>{currentLand.owner}</Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
+
+      {/* 编辑模态框 */}
+      <Modal
+        title="编辑地块"
+        open={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        onOk={handleEditSubmit}
+        width={700}
+      >
+        {currentLand && (
+          <Form form={form} layout="vertical" initialValues={currentLand}>
+            <Form.Item name="id" label="地块编号" rules={[{ required: true, message: '请输入地块编号' }]}>
+              <Input disabled />
+            </Form.Item>
+            <Form.Item name="name" label="地块名称" rules={[{ required: true, message: '请输入地块名称' }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="area" label="面积(㎡)" rules={[{ required: true, message: '请输入面积' }]}>
+              <Input type="number" />
+            </Form.Item>
+            <Form.Item name="type" label="用地类型" rules={[{ required: true, message: '请选择用地类型' }]}>
+              <Select>
+                <Option value="住宅用地">住宅用地</Option>
+                <Option value="工业用地">工业用地</Option>
+                <Option value="商业用地">商业用地</Option>
+                <Option value="公共设施用地">公共设施用地</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item name="location" label="位置" rules={[{ required: true, message: '请输入位置' }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="status" label="出让状态" rules={[{ required: true, message: '请选择出让状态' }]}>
+              <Select>
+                <Option value="已出让">已出让</Option>
+                <Option value="未出让">未出让</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item name="owner" label="使用权人">
+              <Input />
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
     </div>
   );
 };

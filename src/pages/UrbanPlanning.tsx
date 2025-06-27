@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Upload, message } from 'antd';
-import { SearchOutlined, UploadOutlined, EnvironmentOutlined, FileImageOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Upload, message, Modal, Descriptions, Form } from 'antd';
+import { SearchOutlined, UploadOutlined, EnvironmentOutlined, FileImageOutlined, CheckCircleOutlined, ClockCircleOutlined, EyeOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
+import { List } from 'antd';
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -35,6 +36,11 @@ const UrbanPlanning: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [planningType, setPlanningType] = useState('all');
   const [activeTabKey, setActiveTabKey] = useState('1');
+  const [viewModalVisible, setViewModalVisible] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [fileModalVisible, setFileModalVisible] = useState(false);
+  const [currentProject, setCurrentProject] = useState<PlanningProject | null>(null);
+  const [form] = Form.useForm();
 
   // 模拟规划项目数据
   const planningProjects: PlanningProject[] = [
@@ -234,9 +240,9 @@ const UrbanPlanning: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" style={{ padding: 0 }}>查看</Button>
-          <Button type="link" style={{ padding: 0 }}>编辑</Button>
-          <Button type="link" style={{ padding: 0 }}>文件</Button>
+          <Button type="link" style={{ padding: 0 }} onClick={() => handleView(record)}>查看</Button>
+          <Button type="link" style={{ padding: 0 }} onClick={() => handleEdit(record)}>编辑</Button>
+          <Button type="link" style={{ padding: 0 }} onClick={() => handleFile(record)}>文件</Button>
         </Space>
       ),
     },
@@ -303,9 +309,11 @@ const UrbanPlanning: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" style={{ padding: 0 }}>预览</Button>
-          <Button type="link" style={{ padding: 0 }}>下载</Button>
-          {record.status === '审核中' && <Button type="link" style={{ padding: 0 }}>审核</Button>}
+          <Button type="link" style={{ padding: 0 }} onClick={() => handlePreview(record)}>预览</Button>
+          <Button type="link" style={{ padding: 0 }} onClick={() => handleDownload(record)}>下载</Button>
+          {record.status === '审核中' && 
+            <Button type="link" style={{ padding: 0 }} onClick={() => handleReview(record)}>审核</Button>
+          }
         </Space>
       ),
     },
@@ -467,6 +475,63 @@ const UrbanPlanning: React.FC = () => {
     },
   };
 
+  const handleView = (record: PlanningProject) => {
+    setCurrentProject(record);
+    setViewModalVisible(true);
+  };
+
+  const handleEdit = (record: PlanningProject) => {
+    setCurrentProject(record);
+    form.setFieldsValue(record);
+    setEditModalVisible(true);
+  };
+
+  const handleFile = (record: PlanningProject) => {
+    setCurrentProject(record);
+    setFileModalVisible(true);
+  };
+
+  const handleEditSubmit = () => {
+    form.validateFields().then(values => {
+      // 在实际应用中，这里会调用API保存数据
+      console.log('提交的表单数据:', values);
+      setEditModalVisible(false);
+    });
+  };
+
+  // 添加文件预览和下载功能
+  const handlePreview = (record: PlanningLayer) => {
+    Modal.info({
+      title: `预览 - ${record.name}`,
+      content: (
+        <div>
+          <p>这里将显示图层预览内容。在实际项目中，会集成地图控件显示空间数据。</p>
+          <p>图层ID: {record.id}</p>
+          <p>图层类型: {record.type}</p>
+          <p>更新时间: {record.updateTime}</p>
+        </div>
+      ),
+      width: 600,
+    });
+  };
+
+  const handleDownload = (record: PlanningLayer) => {
+    // 实际项目中，这里会调用API请求下载文件
+    console.log(`下载文件: ${record.name}`);
+    message.success(`${record.name} 文件开始下载`);
+  };
+
+  const handleReview = (record: PlanningLayer) => {
+    Modal.confirm({
+      title: '审核图层',
+      content: `您确定要审核并发布图层"${record.name}"吗？`,
+      onOk() {
+        // 实际项目中，这里会调用API提交审核
+        message.success(`图层 ${record.name} 已审核通过并发布`);
+      }
+    });
+  };
+
   return (
     <div className="urban-planning">
       <h2>城市规划管理</h2>
@@ -610,6 +675,128 @@ const UrbanPlanning: React.FC = () => {
           </Card>
         </TabPane>
       </Tabs>
+
+      {/* 查看详情模态框 */}
+      <Modal
+        title="规划项目详情"
+        open={viewModalVisible}
+        onCancel={() => setViewModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setViewModalVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentProject && (
+          <Descriptions bordered column={2}>
+            <Descriptions.Item label="项目编号">{currentProject.id}</Descriptions.Item>
+            <Descriptions.Item label="项目名称">{currentProject.name}</Descriptions.Item>
+            <Descriptions.Item label="规划类型">{currentProject.type}</Descriptions.Item>
+            <Descriptions.Item label="规划范围">{currentProject.area}</Descriptions.Item>
+            <Descriptions.Item label="开始日期">{currentProject.startDate}</Descriptions.Item>
+            <Descriptions.Item label="结束日期">{currentProject.endDate}</Descriptions.Item>
+            <Descriptions.Item label="状态">{currentProject.status}</Descriptions.Item>
+            <Descriptions.Item label="负责人">{currentProject.principal}</Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
+
+      {/* 编辑模态框 */}
+      <Modal
+        title="编辑规划项目"
+        open={editModalVisible}
+        onCancel={() => setEditModalVisible(false)}
+        onOk={handleEditSubmit}
+        width={700}
+      >
+        {currentProject && (
+          <Form form={form} layout="vertical" initialValues={currentProject}>
+            <Form.Item name="id" label="项目编号" rules={[{ required: true }]}>
+              <Input disabled />
+            </Form.Item>
+            <Form.Item name="name" label="项目名称" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="type" label="规划类型" rules={[{ required: true }]}>
+              <Select>
+                <Option value="总体规划">总体规划</Option>
+                <Option value="控制性详细规划">控制性详细规划</Option>
+                <Option value="详细规划">详细规划</Option>
+                <Option value="专项规划">专项规划</Option>
+                <Option value="土地利用规划">土地利用规划</Option>
+                <Option value="城市设计">城市设计</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item name="area" label="规划范围" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="startDate" label="开始日期" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="endDate" label="结束日期" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+            <Form.Item name="status" label="状态" rules={[{ required: true }]}>
+              <Select>
+                <Option value="编制中">编制中</Option>
+                <Option value="审批中">审批中</Option>
+                <Option value="实施中">实施中</Option>
+                <Option value="已完成">已完成</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item name="principal" label="负责人" rules={[{ required: true }]}>
+              <Input />
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
+
+      {/* 文件管理模态框 */}
+      <Modal
+        title="文件管理"
+        open={fileModalVisible}
+        onCancel={() => setFileModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setFileModalVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentProject && (
+          <div>
+            <h3>{currentProject.name} - 相关文件</h3>
+            <List
+              bordered
+              dataSource={[
+                { name: `${currentProject.name}-规划图.pdf`, type: "PDF", size: "2.5MB", date: "2023-10-15" },
+                { name: `${currentProject.name}-说明书.doc`, type: "Word", size: "1.8MB", date: "2023-10-12" },
+                { name: `${currentProject.name}-数据表.xlsx`, type: "Excel", size: "0.5MB", date: "2023-10-10" }
+              ]}
+              renderItem={item => (
+                <List.Item
+                  actions={[
+                    <Button type="link">预览</Button>,
+                    <Button type="link">下载</Button>
+                  ]}
+                >
+                  <List.Item.Meta
+                    title={item.name}
+                    description={`${item.type} | ${item.size} | 上传日期: ${item.date}`}
+                  />
+                </List.Item>
+              )}
+            />
+            <div style={{ marginTop: 20 }}>
+              <Upload>
+                <Button icon={<UploadOutlined />}>上传文件</Button>
+              </Upload>
+            </div>
+          </div>
+        )}
+      </Modal>
+
     </div>
   );
 };

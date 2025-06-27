@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Row, Col, Statistic, Table, Tabs, DatePicker, Button, Select, Alert, Progress, Tag } from 'antd';
-import { AreaChartOutlined, EnvironmentOutlined, WarningOutlined, ExclamationCircleOutlined, EyeOutlined, LineChartOutlined, DownloadOutlined, CheckCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Statistic, Table, Tabs, DatePicker, Button, Select, Alert, Progress, Tag, Modal, Descriptions, Space, message } from 'antd';
+import { AreaChartOutlined, EnvironmentOutlined, WarningOutlined, ExclamationCircleOutlined, EyeOutlined, LineChartOutlined, DownloadOutlined, CheckCircleOutlined, SearchOutlined, FilePdfOutlined, FileExcelOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
 
@@ -41,6 +41,12 @@ interface WarningRecord {
 const ResourceMonitoring: React.FC = () => {
   const [resourceType, setResourceType] = useState<string>('all');
   const [activeTab, setActiveTab] = useState<string>('1');
+  const [trendModalVisible, setTrendModalVisible] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
+  const [warningListModalVisible, setWarningListModalVisible] = useState(false);
+  const [exportModalVisible, setExportModalVisible] = useState(false);
+  const [currentPoint, setCurrentPoint] = useState<MonitoringPoint | null>(null);
+  const [currentWarning, setCurrentWarning] = useState<WarningRecord | null>(null);
 
   // 模拟监测点数据
   const monitoringPoints: MonitoringPoint[] = [
@@ -206,209 +212,6 @@ const ResourceMonitoring: React.FC = () => {
     },
   ];
 
-  // 监测点表格列定义
-  const monitoringColumns: ColumnsType<MonitoringPoint> = [
-    {
-      title: '监测点编号',
-      dataIndex: 'id',
-      key: 'id',
-      sorter: (a, b) => a.id.localeCompare(b.id),
-    },
-    {
-      title: '监测点名称',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text) => <Button type="link" style={{ padding: 0 }}>{text}</Button>,
-    },
-    {
-      title: '资源类型',
-      dataIndex: 'type',
-      key: 'type',
-      filters: [
-        { text: '水资源', value: '水资源' },
-        { text: '土地资源', value: '土地资源' },
-        { text: '森林资源', value: '森林资源' },
-        { text: '矿产资源', value: '矿产资源' },
-        { text: '大气资源', value: '大气资源' },
-      ],
-      onFilter: (value, record) => 
-        typeof value === 'string' && record.type.indexOf(value) === 0,
-    },
-    {
-      title: '位置',
-      dataIndex: 'location',
-      key: 'location',
-    },
-    {
-      title: '监测值',
-      dataIndex: 'value',
-      key: 'value',
-      render: (value, record) => `${value} ${record.unit}`,
-      sorter: (a, b) => a.value - b.value,
-    },
-    {
-      title: '变化趋势',
-      dataIndex: 'trend',
-      key: 'trend',
-      render: (trend) => {
-        let icon = null;
-        if (trend === '下降') {
-          icon = <span style={{ color: 'red' }}>↓</span>;
-        } else if (trend === '上升') {
-          icon = <span style={{ color: 'green' }}>↑</span>;
-        }
-        return (
-          <span>
-            {trend} {icon}
-          </span>
-        );
-      },
-    },
-    {
-      title: '预警级别',
-      dataIndex: 'warningLevel',
-      key: 'warningLevel',
-      render: (level) => {
-        let color = 'green';
-        if (level === '轻度预警') color = 'orange';
-        if (level === '中度预警') color = 'red';
-        if (level === '重度预警') color = 'purple';
-        return (
-          <Tag color={color}>
-            {level}
-          </Tag>
-        );
-      },
-      filters: [
-        { text: '正常', value: '正常' },
-        { text: '轻度预警', value: '轻度预警' },
-        { text: '中度预警', value: '中度预警' },
-        { text: '重度预警', value: '重度预警' },
-      ],
-      onFilter: (value, record) => 
-        typeof value === 'string' && record.warningLevel.indexOf(value) === 0,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        let color = 'green';
-        if (status === '异常') color = 'red';
-        return (
-          <Tag color={color}>
-            {status}
-          </Tag>
-        );
-      },
-    },
-    {
-      title: '最后更新',
-      dataIndex: 'lastUpdate',
-      key: 'lastUpdate',
-      sorter: (a, b) => a.lastUpdate.localeCompare(b.lastUpdate),
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_, record) => (
-        <Button type="link" icon={<LineChartOutlined />}>查看趋势</Button>
-      ),
-    },
-  ];
-
-  // 预警记录表格列定义
-  const warningColumns: ColumnsType<WarningRecord> = [
-    {
-      title: '预警编号',
-      dataIndex: 'id',
-      key: 'id',
-    },
-    {
-      title: '监测点',
-      dataIndex: 'pointName',
-      key: 'pointName',
-      render: (text) => <Button type="link" style={{ padding: 0 }}>{text}</Button>,
-    },
-    {
-      title: '资源类型',
-      dataIndex: 'type',
-      key: 'type',
-      filters: [
-        { text: '水资源', value: '水资源' },
-        { text: '土地资源', value: '土地资源' },
-        { text: '森林资源', value: '森林资源' },
-        { text: '矿产资源', value: '矿产资源' },
-        { text: '大气资源', value: '大气资源' },
-      ],
-      onFilter: (value, record) => 
-        typeof value === 'string' && record.type.indexOf(value) === 0,
-    },
-    {
-      title: '预警时间',
-      dataIndex: 'time',
-      key: 'time',
-      sorter: (a, b) => a.time.localeCompare(b.time),
-    },
-    {
-      title: '预警值/阈值',
-      key: 'values',
-      render: (_, record) => (
-        <span>
-          {record.value}/{record.threshold} {record.unit}
-        </span>
-      ),
-    },
-    {
-      title: '预警级别',
-      dataIndex: 'level',
-      key: 'level',
-      render: (level) => {
-        let color = 'orange';
-        if (level === '中度预警') color = 'red';
-        if (level === '重度预警') color = 'purple';
-        return (
-          <Tag color={color}>
-            {level}
-          </Tag>
-        );
-      },
-      filters: [
-        { text: '轻度预警', value: '轻度预警' },
-        { text: '中度预警', value: '中度预警' },
-        { text: '重度预警', value: '重度预警' },
-      ],
-      onFilter: (value, record) => 
-        typeof value === 'string' && record.level.indexOf(value) === 0,
-    },
-    {
-      title: '状态',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => {
-        const color = status === '已处理' ? 'green' : 'orange';
-        return (
-          <Tag color={color}>
-            {status}
-          </Tag>
-        );
-      },
-      filters: [
-        { text: '处理中', value: '处理中' },
-        { text: '已处理', value: '已处理' },
-      ],
-      onFilter: (value, record) => 
-        typeof value === 'string' && record.status.indexOf(value) === 0,
-    },
-    {
-      title: '操作',
-      key: 'action',
-      render: (_, record) => (
-        <Button type="link" icon={<EyeOutlined />}>查看详情</Button>
-      ),
-    },
-  ];
-
   // 资源监测仪表盘数据
   const resourceQualityData = [
     { name: '水资源', value: 85.2 },
@@ -518,6 +321,284 @@ const ResourceMonitoring: React.FC = () => {
     ]
   };
 
+  // 查看趋势图表数据
+  const getPointTrendData = (point: MonitoringPoint) => {
+    // 模拟过去6个月的数据
+    const months = ['10月', '11月', '12月', '1月', '2月', '3月'];
+    
+    let data;
+    if (point.trend === '上升') {
+      data = [point.value * 0.8, point.value * 0.85, point.value * 0.9, point.value * 0.93, point.value * 0.96, point.value];
+    } else if (point.trend === '下降') {
+      data = [point.value * 1.2, point.value * 1.15, point.value * 1.1, point.value * 1.05, point.value * 1.02, point.value];
+    } else { // 稳定
+      data = [point.value * 0.98, point.value * 1.02, point.value * 0.99, point.value * 1.01, point.value * 0.97, point.value];
+    }
+    
+    return {
+      title: {
+        text: `${point.name} - 监测趋势`,
+        left: 'center'
+      },
+      tooltip: {
+        trigger: 'axis'
+      },
+      xAxis: {
+        type: 'category',
+        data: months
+      },
+      yAxis: {
+        type: 'value',
+        name: point.unit
+      },
+      series: [{
+        name: '监测值',
+        type: 'line',
+        data: data,
+        markLine: {
+          data: [
+            { 
+              name: '标准值', 
+              yAxis: point.type === '大气资源' ? 70 : 80,
+              lineStyle: { color: '#f5222d' },
+              label: { show: true, position: 'middle', formatter: '预警阈值' }
+            }
+          ]
+        }
+      }]
+    };
+  };
+
+  // 处理按钮点击事件
+  const handleViewTrend = (record: MonitoringPoint) => {
+    setCurrentPoint(record);
+    setTrendModalVisible(true);
+  };
+
+  const handleViewDetail = (record: WarningRecord) => {
+    setCurrentWarning(record);
+    setDetailModalVisible(true);
+  };
+
+  const handleViewAllWarnings = () => {
+    setWarningListModalVisible(true);
+    // 自动切换到预警管理选项卡
+    setActiveTab('3');
+  };
+
+  const handleExportReport = () => {
+    setExportModalVisible(true);
+  };
+
+  const handleExport = (type: string) => {
+    // 真实应用中会调用API生成并下载报告
+    message.success(`资源监测分析${type === 'excel' ? 'Excel' : 'PDF'}报告已开始下载`);
+    setExportModalVisible(false);
+  };
+
+  // 监测点表格列定义
+  const monitoringColumns: ColumnsType<MonitoringPoint> = [
+    {
+      title: '监测点编号',
+      dataIndex: 'id',
+      key: 'id',
+      sorter: (a, b) => a.id.localeCompare(b.id),
+    },
+    {
+      title: '监测点名称',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text) => <Button type="link" style={{ padding: 0 }}>{text}</Button>,
+    },
+    {
+      title: '资源类型',
+      dataIndex: 'type',
+      key: 'type',
+      filters: [
+        { text: '水资源', value: '水资源' },
+        { text: '土地资源', value: '土地资源' },
+        { text: '森林资源', value: '森林资源' },
+        { text: '矿产资源', value: '矿产资源' },
+        { text: '大气资源', value: '大气资源' },
+      ],
+      onFilter: (value, record) => 
+        typeof value === 'string' && record.type.indexOf(value) === 0,
+    },
+    {
+      title: '位置',
+      dataIndex: 'location',
+      key: 'location',
+    },
+    {
+      title: '监测值',
+      dataIndex: 'value',
+      key: 'value',
+      render: (value, record) => `${value} ${record.unit}`,
+      sorter: (a, b) => a.value - b.value,
+    },
+    {
+      title: '变化趋势',
+      dataIndex: 'trend',
+      key: 'trend',
+      render: (trend) => {
+        let icon = null;
+        if (trend === '下降') {
+          icon = <span style={{ color: 'red' }}>↓</span>;
+        } else if (trend === '上升') {
+          icon = <span style={{ color: 'green' }}>↑</span>;
+        }
+        return (
+          <span>
+            {trend} {icon}
+          </span>
+        );
+      },
+    },
+    {
+      title: '预警级别',
+      dataIndex: 'warningLevel',
+      key: 'warningLevel',
+      render: (level) => {
+        let color = 'green';
+        if (level === '轻度预警') color = 'orange';
+        if (level === '中度预警') color = 'red';
+        if (level === '重度预警') color = 'purple';
+        return (
+          <Tag color={color}>
+            {level}
+          </Tag>
+        );
+      },
+      filters: [
+        { text: '正常', value: '正常' },
+        { text: '轻度预警', value: '轻度预警' },
+        { text: '中度预警', value: '中度预警' },
+        { text: '重度预警', value: '重度预警' },
+      ],
+      onFilter: (value, record) => 
+        typeof value === 'string' && record.warningLevel.indexOf(value) === 0,
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        let color = 'green';
+        if (status === '异常') color = 'red';
+        return (
+          <Tag color={color}>
+            {status}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: '最后更新',
+      dataIndex: 'lastUpdate',
+      key: 'lastUpdate',
+      sorter: (a, b) => a.lastUpdate.localeCompare(b.lastUpdate),
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_, record) => (
+        <Button type="link" icon={<LineChartOutlined />} onClick={() => handleViewTrend(record)}>查看趋势</Button>
+      ),
+    },
+  ];
+
+  // 预警记录表格列定义
+  const warningColumns: ColumnsType<WarningRecord> = [
+    {
+      title: '预警编号',
+      dataIndex: 'id',
+      key: 'id',
+    },
+    {
+      title: '监测点',
+      dataIndex: 'pointName',
+      key: 'pointName',
+      render: (text) => <Button type="link" style={{ padding: 0 }}>{text}</Button>,
+    },
+    {
+      title: '资源类型',
+      dataIndex: 'type',
+      key: 'type',
+      filters: [
+        { text: '水资源', value: '水资源' },
+        { text: '土地资源', value: '土地资源' },
+        { text: '森林资源', value: '森林资源' },
+        { text: '矿产资源', value: '矿产资源' },
+        { text: '大气资源', value: '大气资源' },
+      ],
+      onFilter: (value, record) => 
+        typeof value === 'string' && record.type.indexOf(value) === 0,
+    },
+    {
+      title: '预警时间',
+      dataIndex: 'time',
+      key: 'time',
+      sorter: (a, b) => a.time.localeCompare(b.time),
+    },
+    {
+      title: '预警值/阈值',
+      key: 'values',
+      render: (_, record) => (
+        <span>
+          {record.value}/{record.threshold} {record.unit}
+        </span>
+      ),
+    },
+    {
+      title: '预警级别',
+      dataIndex: 'level',
+      key: 'level',
+      render: (level) => {
+        let color = 'orange';
+        if (level === '中度预警') color = 'red';
+        if (level === '重度预警') color = 'purple';
+        return (
+          <Tag color={color}>
+            {level}
+          </Tag>
+        );
+      },
+      filters: [
+        { text: '轻度预警', value: '轻度预警' },
+        { text: '中度预警', value: '中度预警' },
+        { text: '重度预警', value: '重度预警' },
+      ],
+      onFilter: (value, record) => 
+        typeof value === 'string' && record.level.indexOf(value) === 0,
+    },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => {
+        const color = status === '已处理' ? 'green' : 'orange';
+        return (
+          <Tag color={color}>
+            {status}
+          </Tag>
+        );
+      },
+      filters: [
+        { text: '处理中', value: '处理中' },
+        { text: '已处理', value: '已处理' },
+      ],
+      onFilter: (value, record) => 
+        typeof value === 'string' && record.status.indexOf(value) === 0,
+    },
+    {
+      title: '操作',
+      key: 'action',
+      render: (_, record) => (
+        <Button type="link" icon={<EyeOutlined />} onClick={() => handleViewDetail(record)}>查看详情</Button>
+      ),
+    },
+  ];
+
   return (
     <div className="resource-monitoring">
       <h2>资源监测分析</h2>
@@ -529,7 +610,7 @@ const ResourceMonitoring: React.FC = () => {
         icon={<WarningOutlined />}
         style={{ marginBottom: 16 }}
         action={
-          <Button size="small" type="default">
+          <Button size="small" type="default" onClick={handleViewAllWarnings}>
             查看详情
           </Button>
         }
@@ -592,7 +673,7 @@ const ResourceMonitoring: React.FC = () => {
             <Col span={24}>
               <Card 
                 title="资源监测预警状态" 
-                extra={<Button type="link" icon={<DownloadOutlined />}>导出报告</Button>}
+                extra={<Button type="link" icon={<DownloadOutlined />} onClick={handleExportReport}>导出报告</Button>}
               >
                 <Row gutter={16}>
                   <Col span={6}>
@@ -737,6 +818,119 @@ const ResourceMonitoring: React.FC = () => {
           </Card>
         </TabPane>
       </Tabs>
+
+      {/* 监测点趋势图模态框 */}
+      <Modal
+        title="监测趋势分析"
+        open={trendModalVisible}
+        onCancel={() => setTrendModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setTrendModalVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={800}
+      >
+        {currentPoint && (
+          <div>
+            <Descriptions bordered column={2} style={{ marginBottom: 20 }}>
+              <Descriptions.Item label="监测点名称">{currentPoint.name}</Descriptions.Item>
+              <Descriptions.Item label="资源类型">{currentPoint.type}</Descriptions.Item>
+              <Descriptions.Item label="当前监测值">{currentPoint.value} {currentPoint.unit}</Descriptions.Item>
+              <Descriptions.Item label="最后更新时间">{currentPoint.lastUpdate}</Descriptions.Item>
+            </Descriptions>
+            <ReactECharts 
+              option={getPointTrendData(currentPoint)} 
+              style={{ height: 400 }} 
+              theme="light"
+            />
+          </div>
+        )}
+      </Modal>
+
+      {/* 预警详情模态框 */}
+      <Modal
+        title="预警详情"
+        open={detailModalVisible}
+        onCancel={() => setDetailModalVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setDetailModalVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentWarning && (
+          <div>
+            <Descriptions bordered column={2}>
+              <Descriptions.Item label="预警编号">{currentWarning.id}</Descriptions.Item>
+              <Descriptions.Item label="监测点">{currentWarning.pointName}</Descriptions.Item>
+              <Descriptions.Item label="资源类型">{currentWarning.type}</Descriptions.Item>
+              <Descriptions.Item label="预警级别">
+                <Tag color={currentWarning.level === '轻度预警' ? 'orange' : 'red'}>
+                  {currentWarning.level}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="预警时间">{currentWarning.time}</Descriptions.Item>
+              <Descriptions.Item label="处理状态">
+                <Tag color={currentWarning.status === '已处理' ? 'green' : 'orange'}>
+                  {currentWarning.status}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="预警值/阈值">
+                {currentWarning.value}/{currentWarning.threshold} {currentWarning.unit}
+              </Descriptions.Item>
+              <Descriptions.Item label="监测点位置">
+                {monitoringPoints.find(p => p.id === currentWarning.pointId)?.location || '未知'}
+              </Descriptions.Item>
+            </Descriptions>
+            
+            {currentWarning.status === '处理中' && (
+              <div style={{ marginTop: 20, textAlign: 'center' }}>
+                <Space>
+                  <Button type="primary" onClick={() => message.success(`已通知相关人员处理预警：${currentWarning.id}`)}>
+                    发送通知
+                  </Button>
+                  <Button onClick={() => message.success(`已将预警${currentWarning.id}标记为已处理`)}>
+                    标记为已处理
+                  </Button>
+                </Space>
+              </div>
+            )}
+          </div>
+        )}
+      </Modal>
+
+      {/* 导出报告模态框 */}
+      <Modal
+        title="导出资源监测报告"
+        open={exportModalVisible}
+        onCancel={() => setExportModalVisible(false)}
+        footer={null}
+        width={500}
+      >
+        <div style={{ padding: '20px 0' }}>
+          <p>请选择导出报告格式：</p>
+          <Space size="large" style={{ marginTop: 20, display: 'flex', justifyContent: 'center' }}>
+            <Button 
+              type="primary" 
+              icon={<FileExcelOutlined />} 
+              size="large" 
+              onClick={() => handleExport('excel')}
+            >
+              Excel格式
+            </Button>
+            <Button 
+              type="primary" 
+              icon={<FilePdfOutlined />} 
+              size="large"
+              onClick={() => handleExport('pdf')}
+            >
+              PDF格式
+            </Button>
+          </Space>
+        </div>
+      </Modal>
     </div>
   );
 };
