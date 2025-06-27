@@ -194,7 +194,7 @@ const BigScreen: React.FC = () => {
     grid: { left: 80, right: 20, bottom: 40, top: 40 },
     xAxis: {
       type: 'category',
-      data: ['2023Q1', '2023Q2', '2023Q3', '2023Q4', '2024Q1'],
+      data: ['2024Q3', '2024Q4', '2025Q1', '2025Q2', '2025Q3'],
       axisLine: { lineStyle: { color: '#3f8efc' } },
       axisLabel: { color: '#fff', fontSize: 16 },
       splitLine: { show: false },

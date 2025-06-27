@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Alert, Progress, DatePicker, Divider } from 'antd';
-import { AreaChartOutlined, EnvironmentOutlined, WarningOutlined, ExclamationCircleOutlined, SearchOutlined, LineChartOutlined, PlusOutlined } from '@ant-design/icons';
+import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Alert, Progress, DatePicker, Divider, Modal, Descriptions, Form, message, Timeline } from 'antd';
+import { AreaChartOutlined, EnvironmentOutlined, WarningOutlined, ExclamationCircleOutlined, SearchOutlined, LineChartOutlined, PlusOutlined, FileTextOutlined, ToolOutlined, SaveOutlined, UserOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
 
@@ -57,6 +57,19 @@ const EcologicalProtection: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [areaType, setAreaType] = useState('all');
   const [activeTabKey, setActiveTabKey] = useState('1');
+  
+  // 模态框状态
+  const [areaDetailVisible, setAreaDetailVisible] = useState(false);
+  const [areaMonitoringVisible, setAreaMonitoringVisible] = useState(false);
+  const [areaManageVisible, setAreaManageVisible] = useState(false);
+  const [stationTrendVisible, setStationTrendVisible] = useState(false);
+  const [stationDetailVisible, setStationDetailVisible] = useState(false);
+  const [eventDetailVisible, setEventDetailVisible] = useState(false);
+  const [eventHandleVisible, setEventHandleVisible] = useState(false);
+  
+  const [currentArea, setCurrentArea] = useState<ProtectionArea | null>(null);
+  const [currentStation, setCurrentStation] = useState<MonitoringStation | null>(null);
+  const [currentEvent, setCurrentEvent] = useState<EcologicalEvent | null>(null);
 
   // 模拟保护区数据
   const protectionAreas: ProtectionArea[] = [
@@ -132,7 +145,7 @@ const EcologicalProtection: React.FC = () => {
       areaName: '邹城市北部湿地保护区',
       type: '水质监测',
       location: '北湿地中心区域',
-      lastUpdate: '2024-03-12 08:30:25',
+      lastUpdate: '2025-06-12 08:30:25',
       indicator: '溶解氧',
       value: 7.5,
       unit: 'mg/L',
@@ -146,7 +159,7 @@ const EcologicalProtection: React.FC = () => {
       areaName: '邹城市东南部森林公园',
       type: '空气质量',
       location: '森林公园入口处',
-      lastUpdate: '2024-03-12 09:15:10',
+      lastUpdate: '2025-06-12 09:15:10',
       indicator: 'PM2.5',
       value: 15.3,
       unit: 'μg/m³',
@@ -160,7 +173,7 @@ const EcologicalProtection: React.FC = () => {
       areaName: '邹城市西部草原生态区',
       type: '土壤监测',
       location: '草原中部区域',
-      lastUpdate: '2024-03-12 07:45:30',
+      lastUpdate: '2025-06-12 07:45:30',
       indicator: '有机质含量',
       value: 3.8,
       unit: '%',
@@ -174,7 +187,7 @@ const EcologicalProtection: React.FC = () => {
       areaName: '邹城市南湖水源保护区',
       type: '水质监测',
       location: '南湖中心位置',
-      lastUpdate: '2024-03-12 06:50:15',
+      lastUpdate: '2025-06-12 06:50:15',
       indicator: '总磷',
       value: 0.05,
       unit: 'mg/L',
@@ -188,7 +201,7 @@ const EcologicalProtection: React.FC = () => {
       areaName: '邹城市中部野生动物栖息地',
       type: '生物多样性',
       location: '栖息地核心区',
-      lastUpdate: '2024-03-12 10:00:00',
+      lastUpdate: '2025-06-12 10:00:00',
       indicator: '物种数量',
       value: 42,
       unit: '种',
@@ -200,12 +213,12 @@ const EcologicalProtection: React.FC = () => {
   const ecologicalEvents: EcologicalEvent[] = [
     {
       key: '1',
-      id: 'ZC-STSJ-2024-001',
+      id: 'ZC-STSJ-2025-001',
       title: '北湿地水质轻度污染事件',
       type: '污染事件',
       areaId: 'ZC-STQ-001',
       areaName: '邹城市北部湿地保护区',
-      date: '2024-02-25 14:30:00',
+      date: '2025-06-05 14:30:00',
       level: '轻度',
       status: '已处理',
       description: '湿地北侧入水口发现轻度污染，疑似上游工业废水排放导致',
@@ -213,12 +226,12 @@ const EcologicalProtection: React.FC = () => {
     },
     {
       key: '2',
-      id: 'ZC-STSJ-2024-002',
+      id: 'ZC-STSJ-2025-002',
       title: '东南森林公园发现非法砍伐',
       type: '破坏事件',
       areaId: 'ZC-STQ-002',
       areaName: '邹城市东南部森林公园',
-      date: '2024-03-05 08:15:00',
+      date: '2025-06-08 08:15:00',
       level: '中度',
       status: '处理中',
       description: '东南角发现约10棵树木被非法砍伐，已收集相关证据',
@@ -226,12 +239,12 @@ const EcologicalProtection: React.FC = () => {
     },
     {
       key: '3',
-      id: 'ZC-STSJ-2024-003',
+      id: 'ZC-STSJ-2025-003',
       title: '西部草原野火事件',
       type: '自然灾害',
       areaId: 'ZC-STQ-003',
       areaName: '邹城市西部草原生态区',
-      date: '2024-01-18 16:45:00',
+      date: '2025-06-01 16:45:00',
       level: '重度',
       status: '已处理',
       description: '西部草原因雷击发生野火，烧毁约200亩草场，已扑灭',
@@ -239,12 +252,12 @@ const EcologicalProtection: React.FC = () => {
     },
     {
       key: '4',
-      id: '邹城市ZC-STSJ-2024-004',
+      id: '邹城市ZC-STSJ-2025-004',
       title: '南湖水源区发现非法排污口',
       type: '污染事件',
       areaId: 'ZC-STQ-004',
       areaName: '邹城市南湖水源保护区',
-      date: '2024-03-10 11:20:00',
+      date: '2025-06-10 11:20:00',
       level: '中度',
       status: '处理中',
       description: '南湖东岸发现一处隐蔽排污口，正在调查污染源',
@@ -252,18 +265,56 @@ const EcologicalProtection: React.FC = () => {
     },
     {
       key: '5',
-      id: 'ZC-STSJ-2024-005',
+      id: 'ZC-STSJ-2025-005',
       title: '野生动物栖息地发现珍稀物种',
       type: '生态发现',
       areaId: 'ZC-STQ-005',
       areaName: '邹城市中部野生动物栖息地',
-      date: '2024-02-28 09:30:00',
+      date: '2025-06-07 09:30:00',
       level: '重要',
       status: '跟踪中',
       description: '在栖息地发现国家二级保护动物白鹭繁殖地，已启动专项保护',
       reporter: '赵巡查',
     },
   ];
+
+  // 处理按钮事件 - 保护区
+  const handleViewArea = (record: ProtectionArea) => {
+    setCurrentArea(record);
+    setAreaDetailVisible(true);
+  };
+
+  const handleMonitoringData = (record: ProtectionArea) => {
+    setCurrentArea(record);
+    setAreaMonitoringVisible(true);
+  };
+
+  const handleManageArea = (record: ProtectionArea) => {
+    setCurrentArea(record);
+    setAreaManageVisible(true);
+  };
+
+  // 处理按钮事件 - 监测点
+  const handleViewTrend = (record: MonitoringStation) => {
+    setCurrentStation(record);
+    setStationTrendVisible(true);
+  };
+
+  const handleViewStationDetail = (record: MonitoringStation) => {
+    setCurrentStation(record);
+    setStationDetailVisible(true);
+  };
+
+  // 处理按钮事件 - 生态事件
+  const handleViewEventDetail = (record: EcologicalEvent) => {
+    setCurrentEvent(record);
+    setEventDetailVisible(true);
+  };
+
+  const handleProcessEvent = (record: EcologicalEvent) => {
+    setCurrentEvent(record);
+    setEventHandleVisible(true);
+  };
 
   // 保护区表格列定义
   const areaColumns: ColumnsType<ProtectionArea> = [
@@ -354,9 +405,9 @@ const EcologicalProtection: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" style={{padding: 0}}>查看详情</Button>
-          <Button type="link" style={{padding: 0}}>监测数据</Button>
-          <Button type="link" style={{padding: 0}}>管理</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleViewArea(record)}>查看详情</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleMonitoringData(record)}>监测数据</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleManageArea(record)}>管理</Button>
         </Space>
       ),
     },
@@ -438,8 +489,8 @@ const EcologicalProtection: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" style={{padding: 0}}>查看趋势</Button>
-          <Button type="link" style={{padding: 0}}>查看详情</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleViewTrend(record)}>查看趋势</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleViewStationDetail(record)}>查看详情</Button>
         </Space>
       ),
     },
@@ -539,8 +590,8 @@ const EcologicalProtection: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" style={{padding: 0}}>查看详情</Button>
-          <Button type="link" style={{padding: 0}}>处理</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleViewEventDetail(record)}>查看详情</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleProcessEvent(record)}>处理</Button>
         </Space>
       ),
     },
@@ -607,7 +658,7 @@ const EcologicalProtection: React.FC = () => {
     },
     xAxis: {
       type: 'category',
-      data: ['2023年9月', '2023年10月', '2023年11月', '2023年12月', '2024年1月', '2024年2月']
+      data: ['2025年1月', '2025年2月', '2025年3月', '2025年4月', '2025年5月', '2025年6月']
     },
     yAxis: {
       type: 'value',
@@ -670,6 +721,61 @@ const EcologicalProtection: React.FC = () => {
             shadowOffsetX: 0,
             shadowColor: 'rgba(0, 0, 0, 0.5)'
           }
+        }
+      }
+    ]
+  };
+
+  // 生成监测点趋势数据
+  const generateTrendData = () => {
+    if (!currentStation) return [];
+    
+    // 模拟生成过去30天的数据
+    const data = [];
+    const today = new Date();
+    const baseValue = currentStation.value;
+    
+    for (let i = 30; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(today.getDate() - i);
+      const dateStr = `${date.getMonth()+1}月${date.getDate()}日`;
+      
+      // 生成一个在基准值附近波动的随机值
+      const randomFactor = 0.9 + Math.random() * 0.2; // 0.9到1.1之间的随机数
+      const value = Number((baseValue * randomFactor).toFixed(2));
+      
+      data.push([dateStr, value]);
+    }
+    
+    return data;
+  };
+
+  // 监测点趋势图配置
+  const stationTrendChartOption = {
+    title: {
+      text: currentStation ? `${currentStation.name} - ${currentStation.indicator}趋势` : '监测数据趋势',
+      left: 'center'
+    },
+    tooltip: {
+      trigger: 'axis'
+    },
+    xAxis: {
+      type: 'category',
+      data: generateTrendData().map(item => item[0])
+    },
+    yAxis: {
+      type: 'value',
+      name: currentStation ? currentStation.unit : ''
+    },
+    series: [
+      {
+        name: currentStation ? currentStation.indicator : '监测值',
+        type: 'line',
+        data: generateTrendData().map(item => item[1]),
+        markLine: {
+          data: [
+            { type: 'average', name: '平均值' }
+          ]
         }
       }
     ]
@@ -984,6 +1090,423 @@ const EcologicalProtection: React.FC = () => {
           </Card>
         </TabPane>
       </Tabs>
+
+      {/* 保护区详情模态框 */}
+      <Modal
+        title="保护区详情"
+        open={areaDetailVisible}
+        onCancel={() => setAreaDetailVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setAreaDetailVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentArea && (
+          <Descriptions bordered column={2}>
+            <Descriptions.Item label="保护区编号">{currentArea.id}</Descriptions.Item>
+            <Descriptions.Item label="保护区名称">{currentArea.name}</Descriptions.Item>
+            <Descriptions.Item label="保护类型">{currentArea.type}</Descriptions.Item>
+            <Descriptions.Item label="位置">{currentArea.location}</Descriptions.Item>
+            <Descriptions.Item label="面积">{currentArea.area}公顷</Descriptions.Item>
+            <Descriptions.Item label="保护级别">{currentArea.level}</Descriptions.Item>
+            <Descriptions.Item label="建立时间">{currentArea.establishDate}</Descriptions.Item>
+            <Descriptions.Item label="管理人员">{currentArea.manager}</Descriptions.Item>
+            <Descriptions.Item label="生态状况">
+              <Tag color={currentArea.status === '良好' ? 'green' : currentArea.status === '一般' ? 'orange' : 'red'}>
+                {currentArea.status}
+              </Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="监测点数量">
+              {monitoringStations.filter(station => station.areaId === currentArea.id).length}个
+            </Descriptions.Item>
+            <Descriptions.Item label="保护区描述" span={2}>
+              {currentArea.name}位于{currentArea.location}，总面积{currentArea.area}公顷，
+              于{currentArea.establishDate}建立，为{currentArea.level}保护区。
+              {currentArea.type === '湿地保护' ? '该区域湿地生态系统完整，是多种水鸟的栖息地。' : 
+               currentArea.type === '森林保护' ? '该区域森林覆盖率高，植被丰富，具有重要的生态价值。' : 
+               currentArea.type === '草原保护' ? '该区域草原生态系统保存完好，是重要的生态屏障。' : 
+               currentArea.type === '水源保护' ? '该区域是重要的饮用水水源地，水质保护至关重要。' : 
+               '该区域是多种珍稀野生动物的栖息地，生物多样性丰富。'}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
+
+      {/* 保护区监测数据模态框 */}
+      <Modal
+        title="保护区监测数据"
+        open={areaMonitoringVisible}
+        onCancel={() => setAreaMonitoringVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setAreaMonitoringVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={800}
+      >
+        {currentArea && (
+          <>
+            <Descriptions title={`${currentArea.name} - 监测数据概览`} bordered column={3} style={{ marginBottom: 20 }}>
+              <Descriptions.Item label="监测点数量">
+                {monitoringStations.filter(station => station.areaId === currentArea.id).length}个
+              </Descriptions.Item>
+              <Descriptions.Item label="异常监测点">
+                {monitoringStations.filter(station => station.areaId === currentArea.id && station.status === '异常').length}个
+              </Descriptions.Item>
+              <Descriptions.Item label="最后更新时间">
+                {monitoringStations
+                  .filter(station => station.areaId === currentArea.id)
+                  .sort((a, b) => b.lastUpdate.localeCompare(a.lastUpdate))[0]?.lastUpdate || '无数据'}
+              </Descriptions.Item>
+            </Descriptions>
+            
+            <Table
+              columns={[
+                { title: '监测点名称', dataIndex: 'name', key: 'name' },
+                { title: '监测类型', dataIndex: 'type', key: 'type' },
+                { title: '监测指标', dataIndex: 'indicator', key: 'indicator' },
+                { 
+                  title: '最新值', 
+                  key: 'value',
+                  render: (_, record) => (
+                    <span>
+                      {record.value} {record.unit}
+                    </span>
+                  )
+                },
+                { 
+                  title: '状态', 
+                  dataIndex: 'status', 
+                  key: 'status',
+                  render: (status) => (
+                    <Tag color={status === '正常' ? 'green' : 'red'}>
+                      {status}
+                    </Tag>
+                  )
+                },
+                { title: '最后更新', dataIndex: 'lastUpdate', key: 'lastUpdate' },
+              ]}
+              dataSource={monitoringStations.filter(station => station.areaId === currentArea.id)}
+              pagination={false}
+            />
+          </>
+        )}
+      </Modal>
+
+      {/* 保护区管理模态框 */}
+      <Modal
+        title="保护区管理"
+        open={areaManageVisible}
+        onCancel={() => setAreaManageVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setAreaManageVisible(false)}>
+            取消
+          </Button>,
+          <Button key="save" type="primary" onClick={() => {
+            message.success('保护区管理信息已更新');
+            setAreaManageVisible(false);
+          }}>
+            保存
+          </Button>,
+        ]}
+        width={700}
+      >
+        {currentArea && (
+          <Form layout="vertical" initialValues={{
+            id: currentArea.id,
+            name: currentArea.name,
+            type: currentArea.type,
+            location: currentArea.location,
+            area: currentArea.area,
+            level: currentArea.level,
+            manager: currentArea.manager,
+            status: currentArea.status
+          }}>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="保护区编号" name="id">
+                  <Input disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="保护区名称" name="name">
+                  <Input />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item label="保护类型" name="type">
+                  <Select>
+                    <Option value="湿地保护">湿地保护</Option>
+                    <Option value="森林保护">森林保护</Option>
+                    <Option value="草原保护">草原保护</Option>
+                    <Option value="水源保护">水源保护</Option>
+                    <Option value="野生动物保护">野生动物保护</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="保护级别" name="level">
+                  <Select>
+                    <Option value="市级">市级</Option>
+                    <Option value="省级">省级</Option>
+                    <Option value="国家级">国家级</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="生态状况" name="status">
+                  <Select>
+                    <Option value="良好">良好</Option>
+                    <Option value="一般">一般</Option>
+                    <Option value="较差">较差</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="位置" name="location">
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="面积(公顷)" name="area">
+                  <Input type="number" />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item label="管理人员" name="manager">
+              <Input prefix={<UserOutlined />} />
+            </Form.Item>
+            <Form.Item label="保护措施">
+              <Input.TextArea rows={4} placeholder="请输入保护措施..." />
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
+
+      {/* 监测点趋势模态框 */}
+      <Modal
+        title="监测数据趋势"
+        open={stationTrendVisible}
+        onCancel={() => setStationTrendVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setStationTrendVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={800}
+      >
+        {currentStation && (
+          <>
+            <Descriptions bordered column={3} style={{ marginBottom: 20 }}>
+              <Descriptions.Item label="监测点名称">{currentStation.name}</Descriptions.Item>
+              <Descriptions.Item label="所属保护区">{currentStation.areaName}</Descriptions.Item>
+              <Descriptions.Item label="监测类型">{currentStation.type}</Descriptions.Item>
+              <Descriptions.Item label="监测指标">{currentStation.indicator}</Descriptions.Item>
+              <Descriptions.Item label="最新值">{currentStation.value} {currentStation.unit}</Descriptions.Item>
+              <Descriptions.Item label="状态">
+                <Tag color={currentStation.status === '正常' ? 'green' : 'red'}>
+                  {currentStation.status}
+                </Tag>
+              </Descriptions.Item>
+            </Descriptions>
+            
+            <ReactECharts option={stationTrendChartOption} style={{ height: 400 }} />
+          </>
+        )}
+      </Modal>
+
+      {/* 监测点详情模态框 */}
+      <Modal
+        title="监测点详情"
+        open={stationDetailVisible}
+        onCancel={() => setStationDetailVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setStationDetailVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentStation && (
+          <>
+            <Descriptions bordered column={2}>
+              <Descriptions.Item label="监测点编号">{currentStation.id}</Descriptions.Item>
+              <Descriptions.Item label="监测点名称">{currentStation.name}</Descriptions.Item>
+              <Descriptions.Item label="所属保护区">{currentStation.areaName}</Descriptions.Item>
+              <Descriptions.Item label="监测类型">{currentStation.type}</Descriptions.Item>
+              <Descriptions.Item label="位置">{currentStation.location}</Descriptions.Item>
+              <Descriptions.Item label="最后更新">{currentStation.lastUpdate}</Descriptions.Item>
+              <Descriptions.Item label="监测指标">{currentStation.indicator}</Descriptions.Item>
+              <Descriptions.Item label="最新值">
+                {currentStation.value} {currentStation.unit}
+              </Descriptions.Item>
+              <Descriptions.Item label="状态">
+                <Tag color={currentStation.status === '正常' ? 'green' : 'red'}>
+                  {currentStation.status}
+                </Tag>
+              </Descriptions.Item>
+            </Descriptions>
+            
+            <div style={{ marginTop: 20 }}>
+              <h4>监测设备信息</h4>
+              <Descriptions bordered column={2}>
+                <Descriptions.Item label="设备型号">ZC-JC-{currentStation.type === '水质监测' ? 'SZ' : currentStation.type === '空气质量' ? 'KQ' : currentStation.type === '土壤监测' ? 'TR' : 'SW'}-2025</Descriptions.Item>
+                <Descriptions.Item label="安装日期">2025-06-15</Descriptions.Item>
+                <Descriptions.Item label="维护周期">30天</Descriptions.Item>
+                <Descriptions.Item label="最后维护">2025-06-01</Descriptions.Item>
+                <Descriptions.Item label="数据传输">实时传输</Descriptions.Item>
+                <Descriptions.Item label="供电方式">太阳能+备用电池</Descriptions.Item>
+              </Descriptions>
+            </div>
+          </>
+        )}
+      </Modal>
+
+      {/* 生态事件详情模态框 */}
+      <Modal
+        title="生态事件详情"
+        open={eventDetailVisible}
+        onCancel={() => setEventDetailVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setEventDetailVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentEvent && (
+          <>
+            <Descriptions bordered column={2}>
+              <Descriptions.Item label="事件编号">{currentEvent.id}</Descriptions.Item>
+              <Descriptions.Item label="事件标题">{currentEvent.title}</Descriptions.Item>
+              <Descriptions.Item label="事件类型">{currentEvent.type}</Descriptions.Item>
+              <Descriptions.Item label="所属保护区">{currentEvent.areaName}</Descriptions.Item>
+              <Descriptions.Item label="发生时间">{currentEvent.date}</Descriptions.Item>
+              <Descriptions.Item label="上报人">{currentEvent.reporter}</Descriptions.Item>
+              <Descriptions.Item label="级别">
+                <Tag color={
+                  currentEvent.level === '轻度' ? 'green' : 
+                  currentEvent.level === '中度' ? 'orange' : 
+                  currentEvent.level === '重度' ? 'red' : 'blue'
+                }>
+                  {currentEvent.level}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="状态">
+                <Tag color={
+                  currentEvent.status === '已处理' ? 'green' : 
+                  currentEvent.status === '处理中' ? 'orange' : 'blue'
+                }>
+                  {currentEvent.status}
+                </Tag>
+              </Descriptions.Item>
+              <Descriptions.Item label="事件描述" span={2}>
+                {currentEvent.description}
+              </Descriptions.Item>
+            </Descriptions>
+            
+            <div style={{ marginTop: 20 }}>
+              <h4>处理记录</h4>
+              <Timeline>
+                <Timeline.Item>
+                  {currentEvent.date} - 事件上报 - {currentEvent.reporter}
+                </Timeline.Item>
+                {currentEvent.status !== '待处理' && (
+                  <Timeline.Item>
+                    {currentEvent.date.split(' ')[0] + ' 10:30:00'} - 事件确认并分配 - 系统管理员
+                  </Timeline.Item>
+                )}
+                {(currentEvent.status === '处理中' || currentEvent.status === '已处理') && (
+                  <Timeline.Item>
+                    {currentEvent.date.split(' ')[0] + ' 14:45:00'} - 开始处理 - 环保专员
+                  </Timeline.Item>
+                )}
+                {currentEvent.status === '已处理' && (
+                  <Timeline.Item>
+                    {currentEvent.date.split(' ')[0].replace(/(\d+)-(\d+)-(\d+)/, (_, y, m, d) => `${y}-${m}-${parseInt(d)+1}`)} - 处理完成 - 环保专员
+                  </Timeline.Item>
+                )}
+              </Timeline>
+            </div>
+          </>
+        )}
+      </Modal>
+
+      {/* 生态事件处理模态框 */}
+      <Modal
+        title="处理生态事件"
+        open={eventHandleVisible}
+        onCancel={() => setEventHandleVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setEventHandleVisible(false)}>
+            取消
+          </Button>,
+          <Button key="submit" type="primary" icon={<SaveOutlined />} onClick={() => {
+            message.success('事件处理信息已保存');
+            setEventHandleVisible(false);
+          }}>
+            保存处理结果
+          </Button>,
+        ]}
+        width={700}
+      >
+        {currentEvent && (
+          <Form layout="vertical">
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="事件编号">
+                  <Input value={currentEvent.id} disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="事件标题">
+                  <Input value={currentEvent.title} disabled />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={8}>
+                <Form.Item label="事件类型">
+                  <Input value={currentEvent.type} disabled />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="级别">
+                  <Input value={currentEvent.level} disabled />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item label="处理状态" required>
+                  <Select defaultValue={currentEvent.status}>
+                    <Option value="待处理">待处理</Option>
+                    <Option value="处理中">处理中</Option>
+                    <Option value="已处理">已处理</Option>
+                    <Option value="跟踪中">跟踪中</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item label="处理人员" required>
+              <Input prefix={<UserOutlined />} placeholder="请输入处理人员姓名" />
+            </Form.Item>
+            <Form.Item label="处理措施" required>
+              <Input.TextArea rows={4} placeholder="请输入处理措施..." />
+            </Form.Item>
+            <Form.Item label="处理结果">
+              <Input.TextArea rows={4} placeholder="请输入处理结果..." />
+            </Form.Item>
+            <Form.Item label="附件上传">
+              <Button icon={<FileTextOutlined />}>上传附件</Button>
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
     </div>
   );
 };

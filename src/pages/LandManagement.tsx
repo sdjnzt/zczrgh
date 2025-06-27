@@ -37,7 +37,7 @@ const LandManagement: React.FC = () => {
   const landData: LandParcel[] = [
     {
       key: '1',
-      id: 'ZC2023001',
+      id: 'ZC2025001',
       name: '邹城市中心区A-12地块',
       area: 25600,
       type: '商业用地',
@@ -47,7 +47,7 @@ const LandManagement: React.FC = () => {
     },
     {
       key: '2',
-      id: 'ZC2023002',
+      id: 'ZC2025002',
       name: '邹城市高新区B-05地块',
       area: 35800,
       type: '工业用地',
@@ -57,7 +57,7 @@ const LandManagement: React.FC = () => {
     },
     {
       key: '3',
-      id: 'ZC2023003',
+      id: 'ZC2025003',
       name: '邹城市东部C-08地块',
       area: 52000,
       type: '住宅用地',
@@ -67,7 +67,7 @@ const LandManagement: React.FC = () => {
     },
     {
       key: '4',
-      id: 'ZC2023004',
+      id: 'ZC2025004',
       name: '邹城市南部D-15地块',
       area: 18500,
       type: '公共设施用地',
@@ -77,7 +77,7 @@ const LandManagement: React.FC = () => {
     },
     {
       key: '5',
-      id: 'ZC2023005',
+      id: 'ZC2025005',
       name: '邹城市西部E-03地块',
       area: 42000,
       type: '工业用地',
@@ -87,7 +87,7 @@ const LandManagement: React.FC = () => {
     },
     {
       key: '6',
-      id: 'ZC2023006',
+      id: 'ZC2025006',
       name: '邹城市北部F-07地块',
       area: 30500,
       type: '住宅用地',
@@ -243,7 +243,7 @@ const LandManagement: React.FC = () => {
     },
     xAxis: {
       type: 'category',
-      data: ['2020年', '2021年', '2022年', '2023年', '2024年']
+      data: ['2020年', '2021年', '2022年', '2025年', '2024年']
     },
     yAxis: [
       {

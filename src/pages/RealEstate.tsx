@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, DatePicker, Progress, Timeline } from 'antd';
-import { SearchOutlined, HomeOutlined, FileAddOutlined, CheckCircleOutlined, ClockCircleOutlined, PrinterOutlined, DownloadOutlined, BarChartOutlined } from '@ant-design/icons';
+import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, DatePicker, Progress, Timeline, Modal, Descriptions, Form, message } from 'antd';
+import { SearchOutlined, HomeOutlined, FileAddOutlined, CheckCircleOutlined, ClockCircleOutlined, PrinterOutlined, DownloadOutlined, BarChartOutlined, EyeOutlined, EditOutlined, FileExcelOutlined, UserOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
 
@@ -40,16 +40,25 @@ const RealEstate: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [propertyType, setPropertyType] = useState('all');
   const [activeTabKey, setActiveTabKey] = useState('1');
+  
+  // 模态框状态
+  const [propertyDetailVisible, setPropertyDetailVisible] = useState(false);
+  const [propertyHandleVisible, setPropertyHandleVisible] = useState(false);
+  const [certificatePrintVisible, setCertificatePrintVisible] = useState(false);
+  const [certificateDetailVisible, setCertificateDetailVisible] = useState(false);
+  const [certificateCancelVisible, setCertificateCancelVisible] = useState(false);
+  const [currentProperty, setCurrentProperty] = useState<RealEstateRegistration | null>(null);
+  const [currentCertificate, setCurrentCertificate] = useState<Certificate | null>(null);
 
   // 模拟不动产登记数据
   const registrations: RealEstateRegistration[] = [
     {
       key: '1',
-      id: 'ZC-BDC-2023-001',
+      id: 'ZC-BDC-2025-001',
       propertyName: '邹城花园小区3号楼501室',
       propertyType: '住宅',
       applicant: '张三',
-      applyDate: '2023-12-15',
+      applyDate: '2025-06-15',
       status: '已登记',
       area: 120.5,
       address: '邹城市中心区花园小区3号楼501室',
@@ -57,11 +66,11 @@ const RealEstate: React.FC = () => {
     },
     {
       key: '2',
-      id: 'ZC-BDC-2023-002',
+      id: 'ZC-BDC-2025-002',
       propertyName: '邹城市东区商业广场A座201',
       propertyType: '商业',
       applicant: '邹城商贸有限公司',
-      applyDate: '2023-11-20',
+      applyDate: '2025-06-10',
       status: '审核中',
       area: 358.6,
       address: '邹城市东区商业广场A座201',
@@ -69,11 +78,11 @@ const RealEstate: React.FC = () => {
     },
     {
       key: '3',
-      id: 'ZC-BDC-2023-003',
+      id: 'ZC-BDC-2025-003',
       propertyName: '邹城市南湖庄园B区12号别墅',
       propertyType: '别墅',
       applicant: '李四',
-      applyDate: '2025-05-10',
+      applyDate: '2025-06-05',
       status: '已登记',
       area: 285.3,
       address: '邹城市南湖庄园B区12号',
@@ -81,11 +90,11 @@ const RealEstate: React.FC = () => {
     },
     {
       key: '4',
-      id: 'ZC-BDC-2023-004',
+      id: 'ZC-BDC-2025-004',
       propertyName: '邹城市工业园区厂房3号',
       propertyType: '工业',
       applicant: '邹城机械制造有限公司',
-      applyDate: '2023-09-05',
+      applyDate: '2025-06-01',
       status: '已驳回',
       area: 1500.0,
       address: '邹城市工业园区东区A-12地块',
@@ -93,11 +102,11 @@ const RealEstate: React.FC = () => {
     },
     {
       key: '5',
-      id: 'ZC-BDC-2024-001',
+      id: 'ZC-BDC-2025-005',
       propertyName: '邹城阳光新城5号楼1单元302室',
       propertyType: '住宅',
       applicant: '王五',
-      applyDate: '2024-01-15',
+      applyDate: '2025-06-08',
       status: '材料补正',
       area: 89.5,
       address: '邹城市北区阳光新城5号楼1单元302室',
@@ -105,11 +114,11 @@ const RealEstate: React.FC = () => {
     },
     {
       key: '6',
-      id: 'ZC-BDC-2024-002',
+      id: 'ZC-BDC-2025-006',
       propertyName: '邹城市中央公园1号地块',
       propertyType: '土地',
       applicant: '邹城房地产开发有限公司',
-      applyDate: '2024-02-20',
+      applyDate: '2025-06-12',
       status: '待受理',
       area: 5000.0,
       address: '邹城市中央公园北侧地块',
@@ -121,65 +130,97 @@ const RealEstate: React.FC = () => {
   const certificates: Certificate[] = [
     {
       key: '1',
-      id: 'ZC-BDC-ZS-2023-001',
-      registrationId: 'ZC-BDC-2023-001',
+      id: 'ZC-BDC-ZS-2025-001',
+      registrationId: 'ZC-BDC-2025-001',
       propertyName: '邹城花园小区3号楼501室',
       propertyType: '住宅',
       owner: '张三',
-      issueDate: '2023-12-20',
-      validPeriod: '2093-12-20',
+      issueDate: '2025-06-20',
+      validPeriod: '2095-06-20',
       area: 120.5,
       status: '有效',
     },
     {
       key: '2',
-      id: 'ZC-BDC-ZS-2023-003',
-      registrationId: 'ZC-BDC-2023-003',
+      id: 'ZC-BDC-ZS-2025-003',
+      registrationId: 'ZC-BDC-2025-003',
       propertyName: '邹城市南湖庄园B区12号别墅',
       propertyType: '别墅',
       owner: '李四',
-      issueDate: '2025-05-15',
-      validPeriod: '2093-10-15',
+      issueDate: '2025-06-15',
+      validPeriod: '2095-06-15',
       area: 285.3,
       status: '有效',
     },
     {
       key: '3',
-      id: 'ZC-BDC-ZS-2023-005',
-      registrationId: 'ZC-BDC-2023-005',
+      id: 'ZC-BDC-ZS-2025-005',
+      registrationId: 'ZC-BDC-2025-005',
       propertyName: '邹城市中心区写字楼A座1003室',
       propertyType: '办公',
       owner: '邹城科技有限公司',
-      issueDate: '2023-08-12',
-      validPeriod: '2063-08-12',
+      issueDate: '2025-06-12',
+      validPeriod: '2065-06-12',
       area: 156.8,
       status: '有效',
     },
     {
       key: '4',
-      id: 'ZC-BDC-ZS-2023-008',
-      registrationId: 'ZC-BDC-2023-008',
+      id: 'ZC-BDC-ZS-2025-008',
+      registrationId: 'ZC-BDC-2025-008',
       propertyName: '邹城市西区商铺B-15号',
       propertyType: '商业',
       owner: '赵六',
-      issueDate: '2023-07-25',
-      validPeriod: '2063-07-25',
+      issueDate: '2025-06-05',
+      validPeriod: '2065-06-05',
       area: 68.5,
       status: '已注销',
     },
     {
       key: '5',
-      id: 'ZC-BDC-ZS-2022-025',
-      registrationId: 'ZC-BDC-2022-025',
+      id: 'ZC-BDC-ZS-2025-025',
+      registrationId: 'ZC-BDC-2025-025',
       propertyName: '邹城市农业示范园3号大棚',
       propertyType: '农业设施',
       owner: '邹城农业发展有限公司',
-      issueDate: '2022-11-10',
-      validPeriod: '2052-11-10',
+      issueDate: '2025-06-01',
+      validPeriod: '2055-06-01',
       area: 2500.0,
       status: '有效',
     },
   ];
+
+  // 处理按钮事件 - 不动产登记
+  const handleViewProperty = (record: RealEstateRegistration) => {
+    setCurrentProperty(record);
+    setPropertyDetailVisible(true);
+  };
+
+  const handleProcessProperty = (record: RealEstateRegistration) => {
+    setCurrentProperty(record);
+    setPropertyHandleVisible(true);
+  };
+
+  const handlePrintCertificate = (record: RealEstateRegistration) => {
+    setCurrentProperty(record);
+    setCertificatePrintVisible(true);
+  };
+
+  // 处理按钮事件 - 不动产证书
+  const handleViewCertificate = (record: Certificate) => {
+    setCurrentCertificate(record);
+    setCertificateDetailVisible(true);
+  };
+
+  const handlePrintCertificate2 = (record: Certificate) => {
+    setCurrentCertificate(record);
+    setCertificatePrintVisible(true);
+  };
+
+  const handleCancelCertificate = (record: Certificate) => {
+    setCurrentCertificate(record);
+    setCertificateCancelVisible(true);
+  };
 
   // 登记表格列定义
   const registrationColumns: ColumnsType<RealEstateRegistration> = [
@@ -262,9 +303,9 @@ const RealEstate: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" style={{padding: 0}}>查看</Button>
-          <Button type="link" style={{padding: 0}}>办理</Button>
-          {record.status === '已登记' && <Button type="link" style={{padding: 0}}>打印证书</Button>}
+          <Button type="link" style={{padding: 0}} onClick={() => handleViewProperty(record)}>查看</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handleProcessProperty(record)}>办理</Button>
+          {record.status === '已登记' && <Button type="link" style={{padding: 0}} onClick={() => handlePrintCertificate(record)}>打印证书</Button>}
         </Space>
       ),
     },
@@ -346,9 +387,9 @@ const RealEstate: React.FC = () => {
       key: 'action',
       render: (_, record) => (
         <Space size="middle">
-          <Button type="link" style={{padding: 0}}>查看</Button>
-          <Button type="link" style={{padding: 0}}>打印</Button>
-          {record.status === '有效' && <Button type="link" style={{padding: 0}}>注销</Button>}
+          <Button type="link" style={{padding: 0}} onClick={() => handleViewCertificate(record)}>查看</Button>
+          <Button type="link" style={{padding: 0}} onClick={() => handlePrintCertificate2(record)}>打印</Button>
+          {record.status === '有效' && <Button type="link" style={{padding: 0}} onClick={() => handleCancelCertificate(record)}>注销</Button>}
         </Space>
       ),
     },
@@ -373,42 +414,36 @@ const RealEstate: React.FC = () => {
     { value: registrations.filter(item => item.propertyType === '别墅').length, name: '别墅' },
   ];
 
-  // 登记趋势图配置
+  // 近期登记趋势图配置
   const registrationTrendOption = {
     title: {
-      text: '月度不动产登记趋势',
+      text: '不动产登记趋势',
       left: 'center'
     },
     tooltip: {
       trigger: 'axis'
     },
     legend: {
-      data: ['住宅', '商业', '其他'],
+      data: ['登记申请数', '发证数'],
       bottom: 10
     },
     xAxis: {
       type: 'category',
-      data: ['2023年9月', '2023年10月', '2023年11月', '2023年12月', '2024年1月', '2024年2月']
+      data: ['2025年1月', '2025年2月', '2025年3月', '2025年4月', '2025年5月', '2025年6月']
     },
     yAxis: {
-      type: 'value',
-      name: '登记数量'
+      type: 'value'
     },
     series: [
       {
-        name: '住宅',
-        type: 'bar',
-        data: [30, 42, 35, 45, 38, 32],
+        name: '登记申请数',
+        type: 'line',
+        data: [45, 52, 48, 60, 65, 58]
       },
       {
-        name: '商业',
-        type: 'bar',
-        data: [12, 15, 18, 10, 14, 16],
-      },
-      {
-        name: '其他',
-        type: 'bar',
-        data: [8, 10, 12, 15, 9, 11],
+        name: '发证数',
+        type: 'line',
+        data: [38, 45, 42, 55, 60, 52]
       }
     ]
   };
@@ -651,6 +686,234 @@ const RealEstate: React.FC = () => {
           </Row>
         </TabPane>
       </Tabs>
+
+      {/* 不动产详情模态框 */}
+      <Modal
+        title="不动产详情"
+        open={propertyDetailVisible}
+        onCancel={() => setPropertyDetailVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setPropertyDetailVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentProperty && (
+          <Descriptions bordered column={2}>
+            <Descriptions.Item label="登记编号">{currentProperty.id}</Descriptions.Item>
+            <Descriptions.Item label="不动产名称">{currentProperty.propertyName}</Descriptions.Item>
+            <Descriptions.Item label="不动产类型">{currentProperty.propertyType}</Descriptions.Item>
+            <Descriptions.Item label="申请人">{currentProperty.applicant}</Descriptions.Item>
+            <Descriptions.Item label="申请日期">{currentProperty.applyDate}</Descriptions.Item>
+            <Descriptions.Item label="经办人">{currentProperty.handler}</Descriptions.Item>
+            <Descriptions.Item label="建筑面积">{currentProperty.area}m²</Descriptions.Item>
+            <Descriptions.Item label="状态">
+              <Tag color={currentProperty.status === '已登记' ? 'green' : currentProperty.status === '已驳回' ? 'red' : 'blue'}>
+                {currentProperty.status}
+              </Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="不动产地址" span={2}>
+              {currentProperty.address}
+            </Descriptions.Item>
+            <Descriptions.Item label="不动产描述" span={2}>
+              {currentProperty.propertyName}位于{currentProperty.address}，
+              建筑面积{currentProperty.area}平方米，
+              {currentProperty.propertyType === '住宅' ? '为住宅用途，包含厨房、卫生间、客厅和卧室等基本居住空间。' : 
+               currentProperty.propertyType === '商业' ? '为商业用途，适合开展零售、餐饮等商业活动。' : 
+               currentProperty.propertyType === '办公' ? '为办公用途，配备了基础办公设施与网络条件。' : 
+               currentProperty.propertyType === '工业' ? '为工业用途，适合开展生产制造活动。' : 
+               currentProperty.propertyType === '土地' ? '为建设用地，可依法进行相关建设活动。' : 
+               '具备完善的功能设施。'}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
+
+      {/* 不动产办理模态框 */}
+      <Modal
+        title="办理不动产登记"
+        open={propertyHandleVisible}
+        onCancel={() => setPropertyHandleVisible(false)}
+        footer={[
+          <Button key="reject" danger onClick={() => {
+            message.success('已驳回该不动产登记申请');
+            setPropertyHandleVisible(false);
+          }}>
+            驳回申请
+          </Button>,
+          <Button key="approve" type="primary" onClick={() => {
+            message.success('已通过该不动产登记申请');
+            setPropertyHandleVisible(false);
+          }}>
+            批准通过
+          </Button>,
+        ]}
+        width={700}
+      >
+        {currentProperty && (
+          <Form layout="vertical">
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="登记编号">
+                  <Input value={currentProperty.id} disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="不动产名称">
+                  <Input value={currentProperty.propertyName} disabled />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Form.Item label="不动产类型">
+                  <Input value={currentProperty.propertyType} disabled />
+                </Form.Item>
+              </Col>
+              <Col span={12}>
+                <Form.Item label="经办人">
+                  <Input defaultValue={currentProperty.handler || '当前用户'} prefix={<UserOutlined />} />
+                </Form.Item>
+              </Col>
+            </Row>
+            <Form.Item label="审核意见">
+              <Input.TextArea rows={4} placeholder="请输入审核意见..." />
+            </Form.Item>
+            <Form.Item label="附件上传">
+              <Button icon={<FileAddOutlined />}>上传附件</Button>
+            </Form.Item>
+          </Form>
+        )}
+      </Modal>
+
+      {/* 证书打印模态框 */}
+      <Modal
+        title="证书打印预览"
+        open={certificatePrintVisible}
+        onCancel={() => setCertificatePrintVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setCertificatePrintVisible(false)}>
+            取消
+          </Button>,
+          <Button key="print" type="primary" icon={<PrinterOutlined />} onClick={() => {
+            message.success('证书打印指令已发送');
+            setCertificatePrintVisible(false);
+          }}>
+            打印证书
+          </Button>,
+        ]}
+        width={800}
+      >
+        <div className="certificate-preview" style={{ padding: 20, border: '1px dashed #ccc', backgroundColor: '#f9f9f9' }}>
+          <h2 style={{ textAlign: 'center' }}>不动产权证书</h2>
+          <p style={{ textAlign: 'center' }}>证书编号: {currentCertificate ? currentCertificate.id : currentProperty ? `ZC-BDC-ZS-${currentProperty.id.substring(7)}` : ''}</p>
+          <Row>
+            <Col span={12}>
+              <p>权利人: {currentCertificate ? currentCertificate.owner : currentProperty?.applicant}</p>
+              <p>坐落: {currentCertificate ? currentCertificate.propertyName : currentProperty?.propertyName}</p>
+              <p>不动产类型: {currentCertificate ? currentCertificate.propertyType : currentProperty?.propertyType}</p>
+              <p>面积: {currentCertificate ? currentCertificate.area : currentProperty?.area} 平方米</p>
+            </Col>
+            <Col span={12}>
+              <p>权利性质: 所有权</p>
+              <p>用途: {currentCertificate ? currentCertificate.propertyType : currentProperty?.propertyType}</p>
+              <p>使用期限: 2025-06-15起 至 2095-06-14止</p>
+              <p>签发日期: 2025年06月20日</p>
+            </Col>
+          </Row>
+          <div style={{ textAlign: 'center', marginTop: 20 }}>
+            <div style={{ width: 120, height: 120, border: '1px solid #ccc', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              公章位置
+            </div>
+          </div>
+        </div>
+      </Modal>
+
+      {/* 证书详情模态框 */}
+      <Modal
+        title="证书详情"
+        open={certificateDetailVisible}
+        onCancel={() => setCertificateDetailVisible(false)}
+        footer={[
+          <Button key="close" onClick={() => setCertificateDetailVisible(false)}>
+            关闭
+          </Button>
+        ]}
+        width={700}
+      >
+        {currentCertificate && (
+          <Descriptions bordered column={2}>
+            <Descriptions.Item label="证书编号">{currentCertificate.id}</Descriptions.Item>
+            <Descriptions.Item label="不动产名称">{currentCertificate.propertyName}</Descriptions.Item>
+            <Descriptions.Item label="不动产类型">{currentCertificate.propertyType}</Descriptions.Item>
+            <Descriptions.Item label="权利人">{currentCertificate.owner}</Descriptions.Item>
+            <Descriptions.Item label="发证日期">{currentCertificate.issueDate}</Descriptions.Item>
+            <Descriptions.Item label="有效期至">{currentCertificate.validPeriod}</Descriptions.Item>
+            <Descriptions.Item label="建筑面积">{currentCertificate.area}m²</Descriptions.Item>
+            <Descriptions.Item label="状态">
+              <Tag color={currentCertificate.status === '有效' ? 'green' : 'red'}>
+                {currentCertificate.status}
+              </Tag>
+            </Descriptions.Item>
+            <Descriptions.Item label="关联登记号">{currentCertificate.registrationId}</Descriptions.Item>
+            <Descriptions.Item label="权利类型">
+              {currentCertificate.propertyType === '住宅' ? '国有建设用地使用权/房屋所有权' : 
+               currentCertificate.propertyType === '商业' ? '国有建设用地使用权/房屋所有权' :
+               currentCertificate.propertyType === '土地' ? '国有建设用地使用权' : '国有建设用地使用权/房屋所有权'}
+            </Descriptions.Item>
+            <Descriptions.Item label="权利性质" span={2}>
+              {currentCertificate.propertyType === '住宅' ? '居住用地/住宅' : 
+               currentCertificate.propertyType === '商业' ? '商业用地/商业服务' :
+               currentCertificate.propertyType === '办公' ? '商业用地/办公' :
+               currentCertificate.propertyType === '工业' ? '工业用地/工业' : '建设用地'}
+            </Descriptions.Item>
+          </Descriptions>
+        )}
+      </Modal>
+
+      {/* 证书注销模态框 */}
+      <Modal
+        title="证书注销"
+        open={certificateCancelVisible}
+        onCancel={() => setCertificateCancelVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setCertificateCancelVisible(false)}>
+            取消
+          </Button>,
+          <Button key="submit" danger onClick={() => {
+            message.success('证书已成功注销');
+            setCertificateCancelVisible(false);
+          }}>
+            确认注销
+          </Button>,
+        ]}
+      >
+        {currentCertificate && (
+          <>
+            <p>您确定要注销以下不动产权证书吗？</p>
+            <Descriptions column={1} bordered>
+              <Descriptions.Item label="证书编号">{currentCertificate.id}</Descriptions.Item>
+              <Descriptions.Item label="不动产名称">{currentCertificate.propertyName}</Descriptions.Item>
+              <Descriptions.Item label="权利人">{currentCertificate.owner}</Descriptions.Item>
+            </Descriptions>
+            <Form layout="vertical" style={{ marginTop: 16 }}>
+              <Form.Item label="注销原因" required>
+                <Select defaultValue="property_transfer">
+                  <Option value="property_transfer">产权转让</Option>
+                  <Option value="property_merge">不动产合并</Option>
+                  <Option value="property_split">不动产分割</Option>
+                  <Option value="information_error">信息错误</Option>
+                  <Option value="other">其他原因</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item label="注销说明">
+                <Input.TextArea rows={4} placeholder="请输入注销说明..." />
+              </Form.Item>
+            </Form>
+          </>
+        )}
+      </Modal>
     </div>
   );
 };

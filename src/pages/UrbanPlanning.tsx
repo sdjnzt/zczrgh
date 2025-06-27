@@ -46,67 +46,67 @@ const UrbanPlanning: React.FC = () => {
   const planningProjects: PlanningProject[] = [
     {
       key: '1',
-      id: 'ZC-GH-2023-001',
+      id: 'ZC-GH-2025-001',
       name: '邹城市中心区控制性详细规划',
       type: '控制性详细规划',
       area: '中心城区',
-      startDate: '2023-03-15',
-      endDate: '2024-06-30',
+      startDate: '2025-06-01',
+      endDate: '2025-06-30',
       status: '实施中',
       principal: '李工',
     },
     {
       key: '2',
-      id: 'ZC-GH-2023-002',
+      id: 'ZC-GH-2025-002',
       name: '邹城市北部新城区总体规划',
       type: '总体规划',
       area: '北部新城',
-      startDate: '2023-05-20',
-      endDate: '2024-05-20',
+      startDate: '2025-06-05',
+      endDate: '2025-06-25',
       status: '实施中',
       principal: '王工',
     },
     {
       key: '3',
-      id: 'ZC-GH-2023-003',
+      id: 'ZC-GH-2025-003',
       name: '邹城市东部产业园区详细规划',
       type: '详细规划',
       area: '东部产业园',
-      startDate: '2023-07-10',
-      endDate: '2024-01-10',
+      startDate: '2025-06-10',
+      endDate: '2025-06-20',
       status: '已完成',
       principal: '张工',
     },
     {
       key: '4',
-      id: 'ZC-GH-2023-004',
+      id: 'ZC-GH-2025-004',
       name: '邹城市南部生态区规划',
       type: '专项规划',
       area: '南部生态区',
-      startDate: '2023-09-05',
-      endDate: '2024-09-05',
+      startDate: '2025-06-05',
+      endDate: '2025-06-25',
       status: '审批中',
       principal: '赵工',
     },
     {
       key: '5',
-      id: 'ZC-GH-2024-001',
+      id: 'ZC-GH-2025-005',
       name: '邹城市西部农业区土地利用规划',
       type: '土地利用规划',
       area: '西部农业区',
-      startDate: '2024-01-15',
-      endDate: '2024-07-15',
+      startDate: '2025-06-08',
+      endDate: '2025-06-28',
       status: '编制中',
       principal: '刘工',
     },
     {
       key: '6',
-      id: 'ZC-GH-2024-002',
+      id: 'ZC-GH-2025-006',
       name: '邹城市高新区城市设计',
       type: '城市设计',
       area: '高新区',
-      startDate: '2024-02-20',
-      endDate: '2024-08-20',
+      startDate: '2025-06-12',
+      endDate: '2025-06-30',
       status: '编制中',
       principal: '孙工',
     },
@@ -116,46 +116,46 @@ const UrbanPlanning: React.FC = () => {
   const planningLayers: PlanningLayer[] = [
     {
       key: '1',
-      id: 'ZC-GHT-2023-001',
+      id: 'ZC-GHT-2025-001',
       name: '邹城市土地利用现状图',
       type: 'shapefile',
-      updateTime: '2023-12-15',
+      updateTime: '2025-06-15',
       size: '156MB',
       status: '已发布',
     },
     {
       key: '2',
-      id: 'ZC-GHT-2023-002',
+      id: 'ZC-GHT-2025-002',
       name: '邹城市总体规划图',
       type: 'geotiff',
-      updateTime: '2023-11-20',
+      updateTime: '2025-06-10',
       size: '245MB',
       status: '已发布',
     },
     {
       key: '3',
-      id: 'ZC-GHT-2023-003',
+      id: 'ZC-GHT-2025-003',
       name: '邹城市生态保护红线图',
       type: 'shapefile',
-      updateTime: '2025-05-05',
+      updateTime: '2025-06-05',
       size: '98MB',
       status: '已发布',
     },
     {
       key: '4',
-      id: 'ZC-GHT-2024-001',
+      id: 'ZC-GHT-2025-004',
       name: '邹城市中心城区控规图',
       type: 'geotiff',
-      updateTime: '2024-01-18',
+      updateTime: '2025-06-18',
       size: '187MB',
       status: '审核中',
     },
     {
       key: '5',
-      id: 'ZC-GHT-2024-002',
+      id: 'ZC-GHT-2025-005',
       name: '邹城市道路交通规划图',
       type: 'shapefile',
-      updateTime: '2024-02-22',
+      updateTime: '2025-06-22',
       size: '124MB',
       status: '审核中',
     },
@@ -360,7 +360,7 @@ const UrbanPlanning: React.FC = () => {
     },
     xAxis: {
       type: 'category',
-      data: ['2020年', '2021年', '2022年', '2023年', '2024年']
+      data: ['2020年', '2021年', '2022年', '2025年', '2024年']
     },
     yAxis: {
       type: 'value',
@@ -754,31 +754,33 @@ const UrbanPlanning: React.FC = () => {
 
       {/* 文件管理模态框 */}
       <Modal
-        title="文件管理"
+        title="规划项目文件"
         open={fileModalVisible}
         onCancel={() => setFileModalVisible(false)}
-        footer={[
-          <Button key="close" onClick={() => setFileModalVisible(false)}>
-            关闭
-          </Button>
-        ]}
+        footer={null}
         width={700}
       >
         {currentProject && (
-          <div>
-            <h3>{currentProject.name} - 相关文件</h3>
+          <>
+            <Descriptions title="项目文件" bordered column={1} style={{ marginBottom: 20 }}>
+              <Descriptions.Item label="项目名称">{currentProject.name}</Descriptions.Item>
+              <Descriptions.Item label="项目编号">{currentProject.id}</Descriptions.Item>
+              <Descriptions.Item label="规划类型">{currentProject.type}</Descriptions.Item>
+            </Descriptions>
+            
             <List
+              header={<div>文件列表</div>}
               bordered
               dataSource={[
-                { name: `${currentProject.name}-规划图.pdf`, type: "PDF", size: "2.5MB", date: "2023-10-15" },
-                { name: `${currentProject.name}-说明书.doc`, type: "Word", size: "1.8MB", date: "2023-10-12" },
-                { name: `${currentProject.name}-数据表.xlsx`, type: "Excel", size: "0.5MB", date: "2023-10-10" }
+                { name: `${currentProject.name}-规划图.pdf`, type: "PDF", size: "2.5MB", date: "2025-06-15" },
+                { name: `${currentProject.name}-说明书.doc`, type: "Word", size: "1.8MB", date: "2025-06-12" },
+                { name: `${currentProject.name}-数据表.xlsx`, type: "Excel", size: "0.5MB", date: "2025-06-10" }
               ]}
               renderItem={item => (
                 <List.Item
                   actions={[
-                    <Button type="link">预览</Button>,
-                    <Button type="link">下载</Button>
+                    <Button type="link" key="view">预览</Button>,
+                    <Button type="link" key="download">下载</Button>
                   ]}
                 >
                   <List.Item.Meta
@@ -788,12 +790,13 @@ const UrbanPlanning: React.FC = () => {
                 </List.Item>
               )}
             />
+            
             <div style={{ marginTop: 20 }}>
               <Upload>
-                <Button icon={<UploadOutlined />}>上传文件</Button>
+                <Button icon={<UploadOutlined />}>上传新文件</Button>
               </Upload>
             </div>
-          </div>
+          </>
         )}
       </Modal>
 
