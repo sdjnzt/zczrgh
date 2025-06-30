@@ -43,7 +43,6 @@ const ResourceMonitoring: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('1');
   const [trendModalVisible, setTrendModalVisible] = useState(false);
   const [detailModalVisible, setDetailModalVisible] = useState(false);
-  const [warningListModalVisible, setWarningListModalVisible] = useState(false);
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [currentPoint, setCurrentPoint] = useState<MonitoringPoint | null>(null);
   const [currentWarning, setCurrentWarning] = useState<WarningRecord | null>(null);
@@ -381,7 +380,6 @@ const ResourceMonitoring: React.FC = () => {
   };
 
   const handleViewAllWarnings = () => {
-    setWarningListModalVisible(true);
     // 自动切换到预警管理选项卡
     setActiveTab('3');
   };

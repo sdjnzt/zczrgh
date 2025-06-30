@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Upload, message, Modal, Descriptions, Form } from 'antd';
-import { SearchOutlined, UploadOutlined, EnvironmentOutlined, FileImageOutlined, CheckCircleOutlined, ClockCircleOutlined, EyeOutlined } from '@ant-design/icons';
+import { SearchOutlined, UploadOutlined, EnvironmentOutlined, FileImageOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
 import { List } from 'antd';
