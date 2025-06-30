@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Table, Tabs, Row, Col, Input, Button, Select, Tag, Space, Statistic, Steps, DatePicker, Form, Tooltip, Modal, Descriptions, message } from 'antd';
-import { SearchOutlined, FileAddOutlined, CheckCircleOutlined, ClockCircleOutlined, FileTextOutlined, EyeOutlined, EditOutlined, ApartmentOutlined, UserOutlined, SaveOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons';
+import { SearchOutlined, FileAddOutlined, CheckCircleOutlined, ClockCircleOutlined, FileTextOutlined, EyeOutlined, EditOutlined, ApartmentOutlined, UserOutlined, SaveOutlined, PlusOutlined } from '@ant-design/icons';
 import ReactECharts from 'echarts-for-react';
 import { ColumnsType } from 'antd/es/table';
 
